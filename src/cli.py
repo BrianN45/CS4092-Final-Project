@@ -1,19 +1,15 @@
 import cmd
-import database
-import re
+
+import cli_helpers
 
 commands = {"staff": ["add", "edit", "remove", "change"], "customer": ["change"]}
 
-
-def get_input(prompt, pattern, error):
-    while True:
-        user_input = input(prompt)
-
-        if re.fullmatch(pattern, user_input):
-            return user_input
-
-        print(error)
-
+def convert(type, value):
+    try:
+        type(value)
+        return True
+    except (ValueError, TypeError):
+        return False
 
 class Interactive(cmd.Cmd):
     intro = "Welcome to the Super Awesome Store! You are currently a customer.\nType help to see the list of commands.\n"
@@ -28,6 +24,21 @@ class Interactive(cmd.Cmd):
         """
         self.isStaff = not self.isStaff
         print(f"You are now a {'Staff Member' if self.isStaff else 'Customer'}.")
+        
+    def do_view_products(self, arg):
+        """
+        Usage: view_products <product id>
+
+        Displays all products in the system, or a specific product if an id is provided.
+        
+        Arguments:
+            <product id> - The id of the product. If no id is provided, all products will be displayed.
+        """
+        if convert(int, arg) and arg != "":
+            cli_helpers.list_products(int(arg))
+        else:
+            print("Invalid input, only whole numbers are allowed. Displaying all products instead.")
+            cli_helpers.list_products(0)
 
     def do_add(self, arg):
         """
@@ -39,37 +50,7 @@ class Interactive(cmd.Cmd):
             print("You are not a staff member.")
             return
 
-        name = get_input(
-            "Name of the product: ",
-            r"^[a-zA-Z]+$",
-            "Invalid input, only alphabetic characters are allowed.",
-        )
-
-        priceStr = get_input(
-            "Price of the product: ",
-            r"^\d{1,3}(?:,\d{3})*(?:\.\d{2})?|\d+(?:\.\d{2})?$",
-            "Invalid input, examples of valid inputs are 50, 12.99, and 1,032.",
-        )
-        price = float(priceStr.replace(",", ""))
-
-        quantity = get_input(
-            "Quantity of the product: ",
-            r"^\d+$",
-            "Invalid input, only whole numbers are allowed.",
-        )
-
-        active = get_input(
-            "Should the product be listed? (Y/N): ",
-            r"^[YN]$",
-            "Invalid input, only Y and N are allowed.",
-        )
-
-        successful = database.add_product(name, price, quantity, active)
-
-        if successful:
-            print(f"Added {name} into the system.")
-        else:
-            print(f"{name} was not added to the system.")
+        cli_helpers.add_product()
 
     def do_edit(self, arg):
         """
@@ -117,5 +98,4 @@ class Interactive(cmd.Cmd):
                 "change - Change your role."
             )
         else:
-            print("\nAvailable commands for Customer:\n" \
-            "change - Change your role.")
+            print("\nAvailable commands for Customer:\nchange - Change your role.")

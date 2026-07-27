@@ -34,5 +34,25 @@ def add_product(name, price, quantity, active):
     except sqlite3.Error as e:
         print(f"Could not add product into system: {e}")
         return False
-    
+
     return True
+
+
+def get_products(id = 0):
+    query = "SELECT * FROM Product"
+    params = ()
+
+    if id != 0:
+        query += " WHERE Id = ?"
+        params = (id,)
+
+    try:
+        with sqlite3.connect(databaseName) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            products = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"Could not retrieve products from system: {e}")
+        return []
+
+    return products
