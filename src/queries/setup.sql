@@ -6,6 +6,8 @@ DROP TABLE IF EXISTS Staff;
 
 DROP TABLE IF EXISTS Product;
 
+DROP TABLE IF EXISTS CreditCard;
+
 CREATE TABLE IF NOT EXISTS Staff (
     Id INTEGER PRIMARY KEY NOT NULL,
     Name NVARCHAR(50) NOT NULL
@@ -34,6 +36,16 @@ CREATE TABLE IF NOT EXISTS Inventory_Updates (
     FOREIGN KEY (Product_Id) REFERENCES Product(Id)
 );
 
+CREATE TABLE IF NOT EXISTS Credit_Card (
+    CardNumber NVARCHAR(16) PRIMARY KEY NOT NULL UNIQUE,
+    Name NVARCHAR(50) NOT NULL,
+    CVC NVARCHAR(3) NOT NULL,
+    ExpirationDate NVARCHAR(5) NOT NULL,
+    StreetAddress NVARCHAR(100) NOT NULL,
+    City NVARCHAR(50) NOT NULL,
+    State NVARCHAR(2) NOT NULL,
+    ZipCode NVARCHAR(10) NOT NULL
+);
 -- Seeding database
 INSERT INTO
     Staff (Name)
@@ -46,4 +58,9 @@ INSERT INTO
 VALUES
     ("Orange", 500, 10, 1),
     ("TV", 50000, 3, 1),
-    ("Owala Bottle", 3000, 57, 1)
+    ("Owala Bottle", 3000, 57, 1);
+
+INSERT INTO
+    CreditCard (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
+VALUES
+    ("1234567890123456", "John Doe", "123", "12/25", "123 Main St", "Anytown", "ST", "12345");
