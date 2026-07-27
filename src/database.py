@@ -56,3 +56,43 @@ def get_products(id = 0):
         return []
 
     return products
+
+
+def add_credit_card(name, number, expiry, cvc, street_address, city, state, zip_code):
+    credit_card = (name, number, expiry, cvc, street_address, city, state, zip_code)
+    query = """
+    INSERT INTO
+        CreditCard (Name, Number, Expiry, CVC, StreetAddress, City, State, ZipCode)
+    VALUES
+        (?, ?, ?, ?, ?, ?, ?, ?)
+    """
+
+    try:
+        with sqlite3.connect(databaseName) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, credit_card)
+    except sqlite3.Error as e:
+        print(f"Could not add credit card into system: {e}")
+        return False
+
+    return True
+
+
+def get_credit_cards(id = 0):
+    query = "SELECT * FROM CreditCard"
+    params = ()
+
+    if id != 0:
+        query += " WHERE Id = ?"
+        params = (id,)
+
+    try:
+        with sqlite3.connect(databaseName) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            credit_cards = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"Could not retrieve credit cards from system: {e}")
+        return []
+
+    return credit_cards

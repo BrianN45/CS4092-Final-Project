@@ -5,12 +5,13 @@
 - Street_Address
 - City
 - State
-- Zip Codea
+- Zip Code
 
 # Credit_Card
 - Credit_Card_Number (Primary Key)
 - Name
 - CVC
+- Expiry_Date
 - Street_Address
 - City
 - State

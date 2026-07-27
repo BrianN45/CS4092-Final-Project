@@ -30,4 +30,4 @@ INSERT INTO
 VALUES
     ("Orange", 500, 10, 1),
     ("TV", 50000, 3, 1),
-    ("Owala Bottle", 3000, 57, 1)
+    ("Owala Bottle", 3000, 57, 1);

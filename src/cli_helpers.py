@@ -47,9 +47,73 @@ def add_product():
         print(f"Added {name} into the system.")
     else:
         print(f"{name} was not added to the system.")
-        
+
 def list_products(id):
     headers = ["Id", "Name", "Price", "Quantity", "Active"]
     data = database.get_products(id)
 
     print(tabulate(data, headers=headers, tablefmt="grid"))
+
+
+def add_credit_card():
+    name = get_input(
+        "Name on the credit card: ",
+        r"^[a-zA-Z]+$",
+        "Invalid input, only alphabetic characters are allowed.",
+    )
+
+    number = get_input(
+        "Credit card number: ",
+        r"^\d{16}$",
+        "Invalid input, only 16-digit numbers are allowed.",
+    )
+
+    expiry = get_input(
+        "Expiry date (MM/YY): ",
+        r"^\d{2}/\d{2}$",
+        "Invalid input, examples of valid inputs are 12/23 and 01/24.",
+    )
+
+    cvc = get_input(
+        "CVC: ",
+        r"^\d{3}$",
+        "Invalid input, only 3-digit numbers are allowed.",
+    )
+
+    street_address = get_input(
+            "Street address: ",
+            r"^[a-zA-Z0-9\s]+$",
+            "Invalid input, only alphanumeric characters and spaces are allowed.",
+        )
+
+    city = get_input(
+        "City: ",
+        r"^[a-zA-Z\s]+$",
+        "Invalid input, only alphabetic characters and spaces are allowed.",
+    )
+
+    state = get_input(
+        "State (2-letter abbreviation): ",
+        r"^[A-Z]{2}$",
+        "Invalid input, only 2 uppercase letters are allowed.",
+    )
+
+    zip_code = get_input(
+        "ZIP code: ",
+        r"^\d{5}$",
+        "Invalid input, only 5-digit numbers are allowed.",
+    )
+
+    successful = database.add_credit_card(name, number, expiry, cvc, street_address, city, state, zip_code)
+
+    if successful:
+        print(f"Added {name}'s credit card into the system.")
+    else:
+        print(f"{name}'s credit card was not added to the system.")
+
+def list_credit_cards(number):
+    headers = ["Name", "Number", "Expiry", "CVC", "Street Address", "City", "State", "ZIP Code"]
+    data = database.get_credit_cards(number)
+
+    print(tabulate(data, headers=headers, tablefmt="grid"))
+        
