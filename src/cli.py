@@ -98,4 +98,7 @@ class Interactive(cmd.Cmd):
                 "change - Change your role."
             )
         else:
-            print("\nAvailable commands for Customer:\nchange - Change your role.")
+            print(
+                "\nAvailable commands for Customer:\n"
+                "change - Change your role.\n"
+            )
