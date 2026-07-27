@@ -37,10 +37,11 @@
 - Date_Updated
 - Staff_Id (References Id in Staff)
 - Product_Id (References Id in Product)
+- Old_Price
 - New_Price
 - Quantity_Change
 - New_Quantity
-- Is_Active
+- Active
 
 # Rate
 - (Customer_Id, Product_Id) (Primary key)
