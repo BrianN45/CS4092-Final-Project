@@ -150,7 +150,7 @@ def add_credit_card(card_number, name, cvc, expiration_date, street_address, cit
     """
 
     try:
-        with sqlite3.connect(databaseName) as connection:
+        with sqlite3.connect(DATABASE_NAME) as connection:
             cursor = connection.cursor()
             cursor.execute(query, credit_card)
     except sqlite3.Error as e:
@@ -169,7 +169,7 @@ def get_credit_cards(id = 0):
         params = (id,)
 
     try:
-        with sqlite3.connect(databaseName) as connection:
+        with sqlite3.connect(DATABASE_NAME) as connection:
             cursor = connection.cursor()
             cursor.execute(query, params)
             credit_cards = cursor.fetchall()

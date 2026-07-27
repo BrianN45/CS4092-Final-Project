@@ -14,6 +14,7 @@ def get_input(prompt, pattern, error):
 
         print(error)
 
+
 def add_product():
     name = get_input(
         "Name of the product: ",
@@ -47,11 +48,12 @@ def add_product():
         print(f"Added {name} into the system.")
     else:
         print(f"{name} was not added to the system.")
-        
+
+
 def edit_product(staffid, productId):
     headers = ["Id", "Name", "Price", "Quantity", "Active"]
     result = database.get_products(productId)
-    
+
     if len(result) == 0:
         print(f"No product with an id of {productId} was found.")
         return
@@ -127,10 +129,10 @@ def add_credit_card():
     )
 
     street_address = get_input(
-            "Street address: ",
-            r"^[a-zA-Z0-9\s]+$",
-            "Invalid input, only alphanumeric characters and spaces are allowed.",
-        )
+        "Street address: ",
+        r"^[a-zA-Z0-9\s]+$",
+        "Invalid input, only alphanumeric characters and spaces are allowed.",
+    )
 
     city = get_input(
         "City: ",
@@ -150,16 +152,27 @@ def add_credit_card():
         "Invalid input, only 5-digit numbers are allowed.",
     )
 
-    successful = database.add_credit_card(card_number, name, cvc, expiry, street_address, city, state, zip_code)
+    successful = database.add_credit_card(
+        card_number, name, cvc, expiry, street_address, city, state, zip_code
+    )
 
     if successful:
         print(f"Added {name}'s credit card into the system.")
     else:
         print(f"{name}'s credit card was not added to the system.")
 
+
 def list_credit_cards(card_number):
-    headers = ["Card Number", "Name", "CVC", "Expiration Date", "Street Address", "City", "State", "ZIP Code"]
+    headers = [
+        "Card Number",
+        "Name",
+        "CVC",
+        "Expiration Date",
+        "Street Address",
+        "City",
+        "State",
+        "ZIP Code",
+    ]
     data = database.get_credit_cards(card_number)
 
     print(tabulate(data, headers=headers, tablefmt="grid"))
-        
