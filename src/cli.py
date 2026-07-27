@@ -3,9 +3,19 @@ import cmd
 
 import cli_helpers
 
-DEFAULT_CUSTOMER_ID = 1 ## CHANGE THIS ##
+DEFAULT_STAFF_ID = 1
+DEFAULT_CUSTOMER_ID = 1
+commands = {
+    "staff": [
+        "add_product",
+        "edit_product",
+        "remove_product",
+        "change",
+        "view_products",
+    ],
+    "customer": ["change", "view_products"],
+}
 
-commands = {"staff": ["add", "edit", "remove", "change", "view_products"], "customer": ["change", "view_products"]}
 
 def convert(type, value):
     try:
@@ -14,10 +24,12 @@ def convert(type, value):
     except (ValueError, TypeError):
         return False
 
+
 class Interactive(cmd.Cmd):
     intro = "Welcome to the Super Awesome Store! You are currently a customer.\nType help to see the list of commands.\n"
     prompt = "\nEnter a command: "
     isStaff = False
+    staffId = DEFAULT_STAFF_ID
     customerId = DEFAULT_CUSTOMER_ID
 
     def do_change(self, arg):
@@ -27,26 +39,29 @@ class Interactive(cmd.Cmd):
         Changes your role. The available roles are Staff Member and Customer.
         """
         self.isStaff = not self.isStaff
-        print(f"You are now a {'Staff Member' if self.isStaff else 'Customer'}.")
-        
+        print(f"You are now a {'staff member' if self.isStaff else 'customer'}.")
+
     def do_view_products(self, arg):
         """
         Usage: view_products <product id>
 
         Displays all products in the system, or a specific product if an id is provided.
-        
+
         Arguments:
             <product id> - The id of the product. If no id is provided, all products will be displayed.
         """
         if convert(int, arg) and arg != "":
             cli_helpers.list_products(int(arg))
         else:
-            print("Invalid input, only whole numbers are allowed. Displaying all products instead.")
+            if arg != "":
+                print(
+                    "Invalid input, only whole numbers are allowed. Displaying all products instead."
+                )
             cli_helpers.list_products(0)
 
-    def do_add(self, arg):
+    def do_add_product(self, arg):
         """
-        Usage: add
+        Usage: add_product
 
         Add a product into a system.
         """
@@ -56,24 +71,32 @@ class Interactive(cmd.Cmd):
 
         cli_helpers.add_product()
 
-    def do_edit(self, arg):
+    def do_edit_product(self, arg):
         """
-        Usage: edit <product id>
+        Usage: edit_product <product id>
 
         Edit a product's quantity and price.
 
         Arguments:
-            <product id> - The id of the product. You can get the list of products using "insert command here"
+            <product id> - The id of the product.
         """
+        if not self.isStaff:
+            print("You are not a staff member.")
+            return
 
-    def do_remove(self, arg):
+        if convert(int, arg) and arg != "":
+            cli_helpers.edit_product(self.staffId, arg)
+        else:
+            print("Invalid input, only product ids are allowed.")
+
+    def do_remove_product(self, arg):
         """
-        Usage: remove <product id>
+        Usage: remove_product <product id>
 
         Remove a product from the system.
 
         Arguments:
-            <product id> - The id of the product. You can get the list of products using "insert command here"
+            <product id> - The id of the product.
         """
 
     def do_view_cards(self, arg):
@@ -140,9 +163,9 @@ class Interactive(cmd.Cmd):
         if self.isStaff:
             print(
                 "\nAvailable commands for Staff:\n"
-                "add - Add a new product.\n"
-                "edit - Edit a product's quantity and price.\n"
-                "remove - Removes a product.\n"
+                "add_product - Add a new product.\n"
+                "edit_product - Edit a product's quantity and price.\n"
+                "remove_product - Removes a product.\n"
                 "change - Change your role.\n"
                 "view_products - View all products or a specific product.\n"
             )

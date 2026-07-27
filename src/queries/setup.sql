@@ -1,5 +1,7 @@
 -- When declaring a primary key it has to be INTEGER and not INT to auto-increment
 
+DROP TABLE IF EXISTS Inventory_Updates;
+
 DROP TABLE IF EXISTS Staff;
 
 DROP TABLE IF EXISTS Product;
@@ -20,7 +22,21 @@ CREATE TABLE IF NOT EXISTS Product (
     Active BOOLEAN NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS CreditCard (
+CREATE TABLE IF NOT EXISTS Inventory_Updates (
+    Staff_Id INT NOT NULL,
+    Product_Id INT NOT NULL,
+    Date_Updated DATE NOT NULL DEFAULT CURRENT_DATE,
+    Old_Price INT NOT NULL,
+    New_Price INT NOT NULL,
+    Quantity_Change INT NOT NULL,
+    New_Quantity INT NOT NULL,
+    Active BOOLEAN NOT NULL,
+    PRIMARY KEY (Staff_Id, Product_Id, Date_Updated),
+    FOREIGN KEY (Staff_Id) REFERENCES Staff(Id),
+    FOREIGN KEY (Product_Id) REFERENCES Product(Id)
+);
+
+CREATE TABLE IF NOT EXISTS Credit_Card (
     CardNumber NVARCHAR(16) PRIMARY KEY NOT NULL UNIQUE,
     Name NVARCHAR(50) NOT NULL,
     CVC NVARCHAR(3) NOT NULL,

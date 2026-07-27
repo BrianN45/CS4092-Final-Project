@@ -1,7 +1,10 @@
 import sqlite3
+from datetime import datetime
 from pathlib import Path
 
-databaseName = "ecommerce.db"
+from product import Product
+
+DATABASE_NAME = "ecommerce.db"
 
 
 def setup_database():
@@ -11,15 +14,16 @@ def setup_database():
         setup = file.read()
 
     try:
-        with sqlite3.connect(databaseName) as connection:
+        with sqlite3.connect(DATABASE_NAME) as connection:
             cursor = connection.cursor()
             cursor.executescript(setup)
     except sqlite3.Error as e:
+        connection.rollback()
         print(f"Could not initiate setup: {e}")
 
 
 def add_product(name, price, quantity, active):
-    product = (name, price, quantity, active)
+    product = Product(name=name, price=price, quantity=quantity, active=bool(active))
     query = """
     INSERT INTO
         Product (Name, Price, Quantity, Active)
@@ -28,17 +32,95 @@ def add_product(name, price, quantity, active):
     """
 
     try:
-        with sqlite3.connect(databaseName) as connection:
+        with sqlite3.connect(DATABASE_NAME) as connection:
             cursor = connection.cursor()
-            cursor.execute(query, product)
+            cursor.execute(query, product.to_db_tuple())
     except sqlite3.Error as e:
+        connection.rollback()
         print(f"Could not add product into system: {e}")
         return False
 
     return True
 
 
-def get_products(id = 0):
+def edit_product(staffId, productId, price, quantity, active):
+    result = get_products(productId)
+
+    if len(result) == 0:
+        print(f"No product with an id of {productId} was found.")
+        return False
+
+    product = result[0]
+
+    # Check if quantity is below 0
+    if product.quantity + quantity < 0:
+        print("New quantity is below 0.")
+        return False
+
+    new_price = product.price if price is None else price
+    new_quantity = product.quantity if quantity is None else product.quantity + quantity
+    new_active = product.active if active is None else bool(active)
+
+    updates = []
+    updateParams = []
+
+    if price is not None:
+        updates.append("Price = ?")
+        updateParams.append(price)
+
+    if quantity is not None:
+        updates.append("Quantity = ?")
+        updateParams.append(quantity + product.quantity)
+
+    if active is not None:
+        updates.append("Active = ?")
+        updateParams.append(int(new_active))
+
+    if not updates:
+        print("No changes made.")
+        return False
+
+    updateParams.append(int(productId))
+    updateQuery = f"UPDATE Product SET {', '.join(updates)} WHERE Id = ?"
+
+    timestamp = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S.%f")
+    logQuery = """
+    INSERT INTO Inventory_Updates (
+        Staff_Id,
+        Product_Id,
+        Date_Updated,
+        Old_Price,
+        New_Price,
+        Quantity_Change,
+        New_Quantity,
+        Active
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """
+    logParams = (
+        int(staffId),
+        int(productId),
+        timestamp,
+        product.price * 100,
+        new_price,
+        quantity,
+        new_quantity,
+        int(new_active),
+    )
+
+    try:
+        with sqlite3.connect(DATABASE_NAME) as connection:
+            cursor = connection.cursor()
+            cursor.execute(updateQuery, updateParams)
+            cursor.execute(logQuery, logParams)
+    except sqlite3.Error as e:
+        connection.rollback()
+        print(f"Could not update product in system: {e}")
+        return False
+
+    return True
+
+
+def get_products(id=0):
     query = "SELECT * FROM Product"
     params = ()
 
@@ -47,22 +129,22 @@ def get_products(id = 0):
         params = (id,)
 
     try:
-        with sqlite3.connect(databaseName) as connection:
+        with sqlite3.connect(DATABASE_NAME) as connection:
             cursor = connection.cursor()
             cursor.execute(query, params)
-            products = cursor.fetchall()
+            rows = cursor.fetchall()
     except sqlite3.Error as e:
         print(f"Could not retrieve products from system: {e}")
         return []
 
-    return products
+    return [Product.from_row(row) for row in rows]
 
 
 def add_credit_card(card_number, name, cvc, expiration_date, street_address, city, state, zip_code):
     credit_card = (card_number, name, cvc, expiration_date, street_address, city, state, zip_code)
     query = """
     INSERT INTO
-        CreditCard (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
+        Credit_Card (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
     VALUES
         (?, ?, ?, ?, ?, ?, ?, ?)
     """
@@ -79,7 +161,7 @@ def add_credit_card(card_number, name, cvc, expiration_date, street_address, cit
 
 
 def get_credit_cards(id = 0):
-    query = "SELECT * FROM CreditCard"
+    query = "SELECT * FROM Credit_Card"
     params = ()
 
     if id != 0:
