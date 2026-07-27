@@ -2,7 +2,7 @@ import cmd
 
 import cli_helpers
 
-commands = {"staff": ["add", "edit", "remove", "change"], "customer": ["change"]}
+commands = {"staff": ["add", "edit", "remove", "change", "view_products"], "customer": ["change", "view_products"]}
 
 def convert(type, value):
     try:
@@ -95,7 +95,11 @@ class Interactive(cmd.Cmd):
                 "add - Add a new product.\n"
                 "edit - Edit a product's quantity and price.\n"
                 "remove - Removes a product.\n"
-                "change - Change your role."
+                "change - Change your role.\n"
+                "view_products - View all products or a specific product.\n"
             )
         else:
-            print("\nAvailable commands for Customer:\nchange - Change your role.")
+            print("\nAvailable commands for Customer:\n"
+                  "change - Change your role.\n"
+                  "view_products - View all products or a specific product.\n"
+            )
