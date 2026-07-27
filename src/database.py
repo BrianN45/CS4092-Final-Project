@@ -58,11 +58,11 @@ def get_products(id = 0):
     return products
 
 
-def add_credit_card(name, number, expiry, cvc, street_address, city, state, zip_code):
-    credit_card = (name, number, expiry, cvc, street_address, city, state, zip_code)
+def add_credit_card(card_number, name, cvc, expiration_date, street_address, city, state, zip_code):
+    credit_card = (card_number, name, cvc, expiration_date, street_address, city, state, zip_code)
     query = """
     INSERT INTO
-        CreditCard (Name, Number, Expiry, CVC, StreetAddress, City, State, ZipCode)
+        CreditCard (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
     VALUES
         (?, ?, ?, ?, ?, ?, ?, ?)
     """

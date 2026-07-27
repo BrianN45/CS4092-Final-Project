@@ -1,6 +1,9 @@
+from ast import arg
 import cmd
 
 import cli_helpers
+
+DEFAULT_CUSTOMER_ID = 1 ## CHANGE THIS ##
 
 commands = {"staff": ["add", "edit", "remove", "change", "view_products"], "customer": ["change", "view_products"]}
 
@@ -15,6 +18,7 @@ class Interactive(cmd.Cmd):
     intro = "Welcome to the Super Awesome Store! You are currently a customer.\nType help to see the list of commands.\n"
     prompt = "\nEnter a command: "
     isStaff = False
+    customerId = DEFAULT_CUSTOMER_ID
 
     def do_change(self, arg):
         """
@@ -72,6 +76,50 @@ class Interactive(cmd.Cmd):
             <product id> - The id of the product. You can get the list of products using "insert command here"
         """
 
+    def do_view_cards(self, arg):
+        """
+        Usage: view_cards <credit card number>
+
+        Displays all credit cards in the system, or a specific credit card if a number is provided.
+            
+        Arguments:
+            <credit card number> - The number of the credit card. If no number is provided, all credit cards will be displayed.
+        """
+        if convert(int, arg) and arg != "":
+            cli_helpers.list_credit_cards(int(arg))
+        else:
+            print("Invalid input, only whole numbers are allowed. Displaying all credit cards instead.")
+            cli_helpers.list_credit_cards(0)
+
+    def do_add_card(self, arg):
+        """
+        Usage: add card
+
+        Add a credit card into the system.
+        """
+
+        cli_helpers.add_credit_card()
+
+    def do_edit_card(self, arg):
+        """
+        Usage: edit <card number>
+
+        Edit a credit card's details.
+
+        Arguments:
+            <card number> - The number of the credit card. You can get the list of credit cards using "insert command here"
+        """
+
+    def do_remove_card(self, arg):
+        """
+        Usage: remove <card number>
+
+        Remove a credit card from the system.
+
+        Arguments:
+            <card number> - The number of the credit card. You can get the list of credit cards using "insert command here"
+        """
+
     def do_exit(self, arg):
         """Exits the application."""
         print("Exiting application.")
@@ -102,4 +150,8 @@ class Interactive(cmd.Cmd):
             print("\nAvailable commands for Customer:\n"
                   "change - Change your role.\n"
                   "view_products - View all products or a specific product.\n"
+                  "add_card - Add a new credit card.\n"
+                  "view_cards - View all credit cards or a specific credit card.\n"
+                  "edit_card - Edit a credit card's details.\n"
+                  "remove_card - Remove a credit card from the system.\n"
             )
