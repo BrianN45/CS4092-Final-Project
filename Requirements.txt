@@ -1,0 +1,19 @@
+E-Commerce System Requirements
+
+The e-commerce system contains customers that each have a unique identifier, date of
+birth, address, and name. A customer can have multiple credit cards associated with
+them. A credit card has a credit card number, CVC, Name, and Address. A credit card
+can be shared among multiple customers.
+
+Products can be bought by customers. A product has a unique identifier, quantity, price,
+name, and the customer should be able to know if it’s available to buy. Customers can
+buy multiple products in a single purchase. A rating can be applied to a product by
+customers. A rating has a rating value and a description of the rating.
+
+When a purchase is made, it will contain information about the quantity of each product
+and the total price of the purchase. A customer can view all their past purchases.
+
+A staff member has a unique identifier and a name. Staff members can change the
+quantity and price of a product. The current quantity of the product will be increased or
+decreased by the staff input. Staff members can also delist a product. Each time a
+product is updated, it is recorded in the system along with when it was updated.
