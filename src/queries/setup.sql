@@ -61,6 +61,6 @@ VALUES
     ("Owala Bottle", 3000, 57, 1);
 
 INSERT INTO
-    CreditCard (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
+    Credit_Card (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
 VALUES
     ("1234567890123456", "John Doe", "123", "12/25", "123 Main St", "Anytown", "ST", "12345");

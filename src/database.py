@@ -20,6 +20,9 @@ def setup_database():
     except sqlite3.Error as e:
         connection.rollback()
         print(f"Could not initiate setup: {e}")
+        return False
+        
+    return True
 
 
 def add_product(name, price, quantity, active):
