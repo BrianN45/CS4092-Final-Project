@@ -4,27 +4,17 @@ import cli_helpers
 
 DEFAULT_STAFF_ID = 1
 DEFAULT_CUSTOMER_ID = 1
-commands = {
-    "staff": [
-        "add_product",
-        "edit_product",
-        "remove_product",
-        "change",
-        "view_products",
-        "view_cards",
-        "add_card",
-        "edit_card",
-        "remove_card",
-    ],
-    "customer": [
-        "change",
-        "view_products",
-        "view_cards",
-        "add_card",
-        "edit_card",
-        "remove_card",
-    ],
-}
+commands = [
+    "add_product",
+    "edit_product",
+    "remove_product",
+    "change",
+    "view_products",
+    "view_cards",
+    "add_card",
+    "edit_card",
+    "remove_card",
+]
 
 
 def convert(type, value):
@@ -36,7 +26,7 @@ def convert(type, value):
 
 
 class Interactive(cmd.Cmd):
-    intro = "Welcome to the Super Awesome Store! You are currently a customer.\nType help to see the list of commands.\n"
+    intro = "Welcome to the Super Awesome Store! You are currently logged in as Brian as a Customer.\nType help to see the list of commands.\n"
     prompt = "\nEnter a command: "
     isStaff = False
     staffId = DEFAULT_STAFF_ID
@@ -44,12 +34,24 @@ class Interactive(cmd.Cmd):
 
     def do_change(self, arg):
         """
-        Usage: change
+        Usage: change <customer/staff>
 
         Changes your role. The available roles are Staff Member and Customer.
+
+        Arguments:
+            <customer/staff>: Either "customer" or "staff," you will be prompted to enter an id afterwards.
         """
-        self.isStaff = not self.isStaff
-        print(f"You are now a {'staff member' if self.isStaff else 'customer'}.")
+        role = arg.strip().lower() if arg else ""
+        if role not in {"customer", "staff"}:
+            print("Please enter a role: customer or staff.")
+            return
+
+        success = cli_helpers.change_role(self, role)
+
+        if success:
+            print(f"You are now a {'staff member' if self.isStaff else 'customer'}.")
+        else:
+            print("Role change unsuccessful.")
 
     def do_view_products(self, arg):
         """
@@ -85,7 +87,7 @@ class Interactive(cmd.Cmd):
         """
         Usage: edit_product <product id>
 
-        Edit a product's quantity and price.
+        Edit a product's quantity and price, or delist it from the store.
 
         Arguments:
             <product id> - The id of the product.
@@ -98,16 +100,6 @@ class Interactive(cmd.Cmd):
             cli_helpers.edit_product(self.staffId, arg)
         else:
             print("Invalid input, only product ids are allowed.")
-
-    def do_remove_product(self, arg):
-        """
-        Usage: remove_product <product id>
-
-        Remove a product from the system.
-
-        Arguments:
-            <product id> - The id of the product.
-        """
 
     def do_view_cards(self, arg):
         """
@@ -133,7 +125,6 @@ class Interactive(cmd.Cmd):
 
         Add a credit card into the system.
         """
-
         cli_helpers.add_credit_card()
 
     def do_edit_card(self, arg):
@@ -162,37 +153,25 @@ class Interactive(cmd.Cmd):
         return True
 
     def do_help(self, arg):
-        role = "staff" if self.isStaff else "customer"
-
         if arg:
-            if arg.lower() in commands[role]:
+            if arg.lower() in commands:
                 super().do_help(arg)
                 return
             else:
-                print(
-                    f"Command for {arg} not found. Listing all commands for your role."
-                )
+                print(f"Command for {arg} not found. Listing all commands.")
 
-        if self.isStaff:
-            print(
-                "\nAvailable commands for Staff:\n"
-                "add_product - Add a new product.\n"
-                "edit_product - Edit a product's quantity and price.\n"
-                "remove_product - Removes a product.\n"
-                "change - Change your role.\n"
-                "view_products - View all products or a specific product.\n"
-                "view_cards - View all credit cards or a specific credit card.\n"
-                "add_card - Add a new credit card.\n"
-                "edit_card - Edit a credit card's details.\n"
-                "remove_card - Remove a credit card from the system.\n"
-            )
-        else:
-            print(
-                "\nAvailable commands for Customer:\n"
-                "change - Change your role.\n"
-                "view_products - View all products or a specific product.\n"
-                "view_cards - View all credit cards or a specific credit card.\n"
-                "add_card - Add a new credit card.\n"
-                "edit_card - Edit a credit card's details.\n"
-                "remove_card - Remove a credit card from the system.\n"
-            )
+        print(
+            "\nAvailable commands for Staff:\n"
+            "add_product - Add a new product.\n"
+            "edit_product - Edit a product's quantity and price, or delist it from the store.\n"
+        )
+        print("\nAvailable commands for Customer:\n")
+        print(
+            "\nAvailable commands for either role:\n"
+            "change - Change your role.\n"
+            "view_cards - View all credit cards or a specific credit card.\n"
+            "add_card - Add a new credit card.\n"
+            "edit_card - Edit a credit card's details.\n"
+            "remove_card - Remove a credit card from the system.\n"
+            "view_products - View all products or a specific product.\n"
+        )

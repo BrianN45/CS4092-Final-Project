@@ -181,3 +181,41 @@ def get_credit_cards(id = 0):
         return []
 
     return credit_cards
+
+def get_customers(id = 0):
+    query = "SELECT * FROM Customer"
+    params = ()
+    
+    if id != 0:
+        query += " WHERE Id = ?"
+        params = (id,)
+        
+    try:
+        with sqlite3.connect(DATABASE_NAME) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            customers = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"Could not retrieve customers from system: {e}")
+        return []
+
+    return customers
+
+def get_staff(id = 0):
+    query = "SELECT * FROM Staff"
+    params = ()
+    
+    if id != 0:
+        query += " WHERE Id = ?"
+        params = (id,)
+        
+    try:
+        with sqlite3.connect(DATABASE_NAME) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            staff = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"Could not retrieve staff from system: {e}")
+        return []
+
+    return staff
