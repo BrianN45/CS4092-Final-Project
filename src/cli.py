@@ -110,8 +110,10 @@ class Interactive(cmd.Cmd):
             <card number> - The number of the credit card. You can get the list of credit cards using "insert command here"
         """
         if convert(int, arg) and arg != "":
-            
             cli_helpers.list_credit_cards(int(arg))
+            print("which field would you like to edit?")
+            field = input("Enter the field name: ")
+            cli_helpers.edit_credit_card(int(arg), field)
         else:
             print("Credit card not found. Displaying all credit cards instead.")
             cli_helpers.list_credit_cards(0)

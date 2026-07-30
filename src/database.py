@@ -96,3 +96,18 @@ def get_credit_cards(card_number = 0):
         return []
 
     return credit_cards
+
+def edit_credit_card(card_number, field, new_value):
+    query = f"UPDATE CreditCard SET {field} = ? WHERE CardNumber = ?"
+    params = (new_value, card_number)
+
+    try:
+        with sqlite3.connect(databaseName) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            connection.commit()
+    except sqlite3.Error as e:
+        print(f"Could not update credit card in system: {e}")
+        return False
+
+    return True
