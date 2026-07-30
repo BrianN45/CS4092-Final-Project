@@ -78,13 +78,13 @@ def add_credit_card(card_number, name, cvc, expiration_date, street_address, cit
     return True
 
 
-def get_credit_cards(id = 0):
+def get_credit_cards(card_number = 0):
     query = "SELECT * FROM CreditCard"
     params = ()
 
-    if id != 0:
-        query += " WHERE Id = ?"
-        params = (id,)
+    if card_number != 0:
+        query += " WHERE CardNumber = ?"
+        params = (card_number,)
 
     try:
         with sqlite3.connect(databaseName) as connection:
