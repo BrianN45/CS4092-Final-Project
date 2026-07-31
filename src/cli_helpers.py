@@ -95,6 +95,54 @@ def edit_product(staffid, productId):
     else:
         print("Product was not updated.")
 
+def buy_product(customer_id, product_id, quantity):
+    successful = database.add_to_cart(customer_id, product_id, quantity)
+
+    if successful:
+        print(f"Added {quantity} of product with id {product_id} to your cart.")
+    else:
+        print(f"Could not add product with id {product_id} to your cart.")
+
+
+def view_cart(customer_id):
+    data = database.get_cart_items(customer_id)
+
+    if not data:
+        print("Your cart is empty.")
+        return
+
+    headers = ["Product ID", "Quantity", "Unit Price"]
+    print(tabulate(data, headers=headers, tablefmt="grid"))
+
+
+def view_purchases(customer_id=None, is_staff=False):
+    data = database.get_purchases(customer_id=customer_id if not is_staff else None)
+
+    if not data:
+        print("No purchases found.")
+        return
+
+    headers = ["Purchase ID", "Customer ID", "Card Number", "Total Price", "Purchase Date", "Product", "Quantity", "Unit Price"]
+    print(tabulate(data, headers=headers, tablefmt="grid"))
+
+
+def checkout(customer_id, card_number):
+    successful = database.checkout_cart(customer_id, card_number)
+
+    if successful:
+        print("Checkout completed successfully.")
+    else:
+        print("Checkout failed.")
+
+def list_purchases(customer_id = None, is_staff = False):
+    headers = ["Purchase ID", "Customer ID", "Purchase Date"]
+    data = database.get_purchases(customer_id=customer_id if not is_staff else None)
+
+    if not data:
+        print("No purchases found.")
+        return
+
+    print(tabulate(data, headers=headers, tablefmt="grid"))
 
 def list_products(id):
     headers = ["Id", "Name", "Price", "Quantity", "Active"]

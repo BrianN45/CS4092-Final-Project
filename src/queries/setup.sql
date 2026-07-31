@@ -10,6 +10,10 @@ DROP TABLE IF EXISTS Product;
 
 DROP TABLE IF EXISTS CreditCard;
 
+DROP TABLE IF EXISTS Purchases;
+
+DROP TABLE IF EXISTS PurchaseItems;
+
 DROP TABLE IF EXISTS CreditCardCustomer;
 
 CREATE TABLE IF NOT EXISTS Staff (
@@ -67,6 +71,35 @@ CREATE TABLE IF NOT EXISTS CreditCardCustomer (
     PRIMARY KEY (CustomerId, CardNumber),
     FOREIGN KEY (CustomerId) REFERENCES Customer(Id),
     FOREIGN KEY (CardNumber) REFERENCES CreditCard(CardNumber)
+);
+
+CREATE TABLE IF NOT EXISTS Purchase (
+    Id INTEGER PRIMARY KEY NOT NULL,
+    CustomerId INTEGER NOT NULL,
+    CardNumber NVARCHAR(16) NOT NULL,
+    TotalPrice INT NOT NULL,
+    PurchaseDate DATE NOT NULL DEFAULT CURRENT_DATE,
+    FOREIGN KEY (CustomerId) REFERENCES Customer(Id),
+    FOREIGN KEY (CardNumber) REFERENCES CreditCard(CardNumber)
+);
+
+CREATE TABLE IF NOT EXISTS PurchasedItem (
+    PurchaseId INTEGER NOT NULL,
+    ProductId INTEGER NOT NULL,
+    UnitPrice INT NOT NULL,
+    Quantity INT NOT NULL,
+    PRIMARY KEY (PurchaseId, ProductId),
+    FOREIGN KEY (PurchaseId) REFERENCES Purchase(Id),
+    FOREIGN KEY (ProductId) REFERENCES Product(Id)
+);
+
+CREATE TABLE IF NOT EXISTS Cart (
+    CustomerId INTEGER NOT NULL,
+    ProductId INTEGER NOT NULL,
+    Quantity INT NOT NULL,
+    PRIMARY KEY (CustomerId, ProductId),
+    FOREIGN KEY (CustomerId) REFERENCES Customer(Id),
+    FOREIGN KEY (ProductId) REFERENCES Product(Id)
 );
 -- Seeding database
 INSERT INTO

@@ -101,6 +101,68 @@ class Interactive(cmd.Cmd):
         else:
             print("Invalid input, only product ids are allowed.")
 
+    def do_buy_product(self, arg):
+        """
+        Usage: buy_product <product id> <quantity>
+
+        Add a product to the customer's cart.
+
+        Arguments:
+            <product id> - The id of the product.
+            <quantity> - The quantity of the product to add to the cart.
+        """
+        if self.isStaff:
+            print("You are not a customer.")
+            return
+
+        args = arg.split()
+        if len(args) != 2 or not all(convert(int, a) for a in args):
+            print("Invalid input, please provide a product id and quantity.")
+            return
+
+        product_id, quantity = map(int, args)
+        cli_helpers.buy_product(self.customerId, product_id, quantity)
+
+    def do_view_cart(self, arg):
+        """
+        Usage: view_cart
+
+        Display the products currently in the customer's cart.
+        """
+        if self.isStaff:
+            print("You are not a customer.")
+            return
+
+        cli_helpers.view_cart(self.customerId)
+
+    def do_view_purchases(self, arg):
+        """
+        Usage: view_purchases
+
+        Display the current customer's purchase history.
+        """
+        if self.isStaff:
+            cli_helpers.view_purchases(is_staff=True)
+            return
+
+        cli_helpers.view_purchases(self.customerId, is_staff=False)
+
+    def do_checkout(self, arg):
+        """
+        Usage: checkout <credit card number>
+
+        Complete the purchase for all products currently in the cart.
+        """
+        if self.isStaff:
+            print("You are not a customer.")
+            return
+
+        if not arg or not convert(int, arg):
+            print("Invalid input, please provide a credit card number.")
+            return
+
+        cli_helpers.checkout(self.customerId, int(arg))
+
     def do_view_cards(self, arg):
         """
         Usage: view_cards <credit card number>
@@ -196,4 +258,8 @@ class Interactive(cmd.Cmd):
             "edit_card - Edit a credit card's details.\n"
             "remove_card - Remove a credit card from the system.\n"
             "view_products - View all products or a specific product.\n"
+            "buy_product - Add a product to your cart.\n"
+            "view_cart - View the products currently in your cart.\n"
+            "view_purchases - View your purchase history.\n"
+            "checkout - Checkout the current cart and create a purchase.\n"
         )

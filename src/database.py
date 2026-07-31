@@ -142,6 +142,136 @@ def get_products(id=0):
 
     return [Product.from_row(row) for row in rows]
 
+def add_to_cart(customer_id, product_id, quantity):
+    products = get_products(product_id)
+    if not products:
+        print(f"No product with an id of {product_id} was found.")
+        return False
+
+    product = products[0]
+    if product.quantity < quantity:
+        print(f"Not enough quantity for product with id {product_id}.")
+        return False
+
+    query = """
+    INSERT INTO Cart (CustomerId, ProductId, Quantity)
+    VALUES (?, ?, ?)
+    ON CONFLICT(CustomerId, ProductId) DO UPDATE SET Quantity = Quantity + excluded.Quantity
+    """
+
+    try:
+        with sqlite3.connect(DATABASE_NAME) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, (int(customer_id), int(product_id), int(quantity)))
+    except sqlite3.Error as e:
+        connection.rollback()
+        print(f"Could not add product to cart: {e}")
+        return False
+
+    return True
+
+
+def checkout_cart(customer_id, card_number):
+    cart_items = get_cart_items(customer_id)
+    if not cart_items:
+        print("Your cart is empty.")
+        return False
+
+    for product_id, quantity, _ in cart_items:
+        products = get_products(product_id)
+        if not products:
+            print(f"No product with an id of {product_id} was found.")
+            return False
+        if products[0].quantity < quantity:
+            print(f"Not enough quantity for product with id {product_id}.")
+            return False
+
+    total_price = 0
+    for _, quantity, unit_price in cart_items:
+        total_price += quantity * unit_price
+
+    purchase_query = """
+    INSERT INTO Purchase (CustomerId, CardNumber, TotalPrice, PurchaseDate)
+    VALUES (?, ?, ?, ?)
+    """
+    item_query = """
+    INSERT INTO PurchasedItem (PurchaseId, ProductId, UnitPrice, Quantity)
+    VALUES (?, ?, ?, ?)
+    """
+    update_query = "UPDATE Product SET Quantity = Quantity - ? WHERE Id = ?"
+    clear_query = "DELETE FROM Cart WHERE CustomerId = ?"
+
+    timestamp = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S.%f")
+
+    try:
+        with sqlite3.connect(DATABASE_NAME) as connection:
+            cursor = connection.cursor()
+            cursor.execute(purchase_query, (int(customer_id), str(card_number), int(total_price), timestamp))
+            purchase_id = cursor.lastrowid
+
+            for product_id, quantity, unit_price in cart_items:
+                cursor.execute(item_query, (purchase_id, int(product_id), int(unit_price), int(quantity)))
+                cursor.execute(update_query, (int(quantity), int(product_id)))
+
+            cursor.execute(clear_query, (int(customer_id),))
+    except sqlite3.Error as e:
+        connection.rollback()
+        print(f"Could not complete checkout: {e}")
+        return False
+
+    return True
+
+
+def get_cart_items(customer_id):
+    query = """
+    SELECT c.ProductId, c.Quantity, p.Price
+    FROM Cart c
+    INNER JOIN Product p ON c.ProductId = p.Id
+    WHERE c.CustomerId = ?
+    """
+
+    try:
+        with sqlite3.connect(DATABASE_NAME) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, (int(customer_id),))
+            return cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"Could not retrieve cart items: {e}")
+        return []
+
+
+def get_purchases(customer_id=None):
+    query = """
+    SELECT
+        p.Id AS PurchaseId,
+        p.CustomerId,
+        p.CardNumber,
+        p.TotalPrice,
+        p.PurchaseDate,
+        pr.Name AS ProductName,
+        pi.Quantity,
+        pi.UnitPrice
+    FROM Purchase p
+    LEFT JOIN PurchasedItem pi ON p.Id = pi.PurchaseId
+    LEFT JOIN Product pr ON pi.ProductId = pr.Id
+    """
+    params = []
+
+    if customer_id is not None:
+        query += " WHERE p.CustomerId = ?"
+        params.append(int(customer_id))
+
+    query += " ORDER BY p.Id, pr.Id"
+
+    try:
+        with sqlite3.connect(DATABASE_NAME) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            return cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"Could not retrieve purchases: {e}")
+        return []
+
 
 def add_credit_card(customer_id, card_number, name, cvc, expiration_date, street_address, city, state, zip_code):
     credit_card = (card_number, name, cvc, expiration_date, street_address, city, state, zip_code)
