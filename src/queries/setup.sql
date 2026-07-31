@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS Inventory_Updates (
     FOREIGN KEY (Product_Id) REFERENCES Product(Id)
 );
 
-CREATE TABLE IF NOT EXISTS Credit_Card (
+CREATE TABLE IF NOT EXISTS CreditCard (
     CardNumber NVARCHAR(16) PRIMARY KEY NOT NULL UNIQUE,
     Name NVARCHAR(50) NOT NULL,
     CVC NVARCHAR(3) NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS CreditCardCustomer (
     CardNumber NVARCHAR(16) NOT NULL,
     PRIMARY KEY (CustomerId, CardNumber),
     FOREIGN KEY (CustomerId) REFERENCES Customer(Id),
-    FOREIGN KEY (CardNumber) REFERENCES Credit_Card(CardNumber)
+    FOREIGN KEY (CardNumber) REFERENCES CreditCard(CardNumber)
 );
 -- Seeding database
 INSERT INTO
@@ -83,14 +83,14 @@ VALUES
     ("Owala Bottle", 3000, 57, 1);
 
 INSERT INTO
-    Credit_Card (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
+    CreditCard (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
 VALUES
     ("1234567890123456", "John Doe", "123", "12/25", "123 Main St", "Anytown", "ST", "12345");
 
 INSERT INTO
     Customer (Name, DoB, StreetAddress, City, State, ZipCode)
 VALUES
-    ("Zach Brown", "1990-01-01", "549 Banana Rd", "Cincinnati", "OH", "45220");    
-    ("Joe Burrow", "1998-02-19", "930 Bengal St", "Cincinnati", "OH", "45247"); 
-    ("Nancy Drew", "2000-10-27", "394 Icecream Dr", "Cincinnati", "OH", "45248"); 
+    ("Zach Brown", "1990-01-01", "549 Banana Rd", "Cincinnati", "OH", "45220"),
+    ("Joe Burrow", "1998-02-19", "930 Bengal St", "Cincinnati", "OH", "45247"),
+    ("Nancy Drew", "2000-10-27", "394 Icecream Dr", "Cincinnati", "OH", "45248");
 

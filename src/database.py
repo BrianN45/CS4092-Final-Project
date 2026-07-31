@@ -147,7 +147,7 @@ def add_credit_card(card_number, name, cvc, expiration_date, street_address, cit
     credit_card = (card_number, name, cvc, expiration_date, street_address, city, state, zip_code)
     query = """
     INSERT INTO
-        Credit_Card (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
+        CreditCard (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
     VALUES
         (?, ?, ?, ?, ?, ?, ?, ?)
     """
@@ -188,7 +188,7 @@ def edit_credit_card(card_number, field, new_value):
     params = (new_value, card_number)
 
     try:
-        with sqlite3.connect(databaseName) as connection:
+        with sqlite3.connect(DATABASE_NAME) as connection:
             cursor = connection.cursor()
             cursor.execute(query, params)
             connection.commit()
