@@ -252,14 +252,13 @@ class Interactive(cmd.Cmd):
         print("\nAvailable commands for Customer:\n")
         print(
             "\nAvailable commands for either role:\n"
-            "change - Change your role.\n"
+            "change [customer/staff]- Change your role.\n"
             "view_cards - View all credit cards or a specific credit card.\n"
             "add_card - Add a new credit card.\n"
-            "edit_card - Edit a credit card's details.\n"
-            "remove_card - Remove a credit card from the system.\n"
+            "edit_card [card_number] - Edit a credit card's details.\n"
             "view_products - View all products or a specific product.\n"
-            "buy_product - Add a product to your cart.\n"
+            "buy_product [product_id] [quantity] - Add a product to your cart.\n"
             "view_cart - View the products currently in your cart.\n"
             "view_purchases - View your purchase history.\n"
-            "checkout - Checkout the current cart and create a purchase.\n"
+            "checkout [card_number] - Checkout the current cart and create a purchase.\n"
         )

@@ -1,19 +1,20 @@
 E-Commerce System Requirements
 
-The e-commerce system contains customers that each have a unique identifier, date of
-birth, address, and name. A customer can have multiple credit cards associated with
-them. A credit card has a credit card number, CVC, Name, and Address. A credit card
-can be shared among multiple customers.
+The e-commerce system contains customers with a unique identifier, date of birth,
+address, and name. A customer can have multiple credit cards associated with them,
+and a credit card can be shared by multiple customers.
 
-Products can be bought by customers. A product has a unique identifier, quantity, price,
-name, and the customer should be able to know if it’s available to buy. Customers can
-buy multiple products in a single purchase. A rating can be applied to a product by
-customers. A rating has a rating value and a description of the rating.
+Products can be viewed and purchased by customers. Each product has a unique
+identifier, name, price, quantity, and an availability flag. Staff members can add,
+edit, and remove products from the system, and can change the quantity or price of an
+existing product. Staff members can also mark a product as unavailable, and every product update is
+logged in the inventory update history.
 
-When a purchase is made, it will contain information about the quantity of each product
-and the total price of the purchase. A customer can view all their past purchases.
+Customers can add products to a temporary cart and continue adding items until they
+checkout. During checkout, the system records a purchase containing the customer ID,
+credit card number, total price, purchase date, and each purchased item with its
+quantity and unit price. Customers can view their purchase history after checkout.
 
-A staff member has a unique identifier and a name. Staff members can change the
-quantity and price of a product. The current quantity of the product will be increased or
-decreased by the staff input. Staff members can also delist a product. Each time a
-product is updated, it is recorded in the system along with when it was updated.
+The system also supports switching between customer and staff roles.
+Customers can view and edit the credit cards associated with their customer ID, and
+staff members are restricted from editing another customer's card records.
