@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS CreditCardCustomer (
 CREATE TABLE IF NOT EXISTS Rating (
     CustomerId INT NOT NULL,
     ProductId INT NOT NULL,
-    Rate DECIMAL NOT NULL,
+    Rate INT NOT NULL,
     Description TEXT NOT NULL,
     PRIMARY KEY (CustomerId, ProductId),
     FOREIGN KEY (CustomerId) REFERENCES Customer(Id),
@@ -106,4 +106,13 @@ VALUES
     ("Zach Brown", "1990-01-01", "549 Banana Rd", "Cincinnati", "OH", "45220"),
     ("Joe Burrow", "1998-02-19", "930 Bengal St", "Cincinnati", "OH", "45247"),
     ("Nancy Drew", "2000-10-27", "394 Icecream Dr", "Cincinnati", "OH", "45248");
+
+INSERT INTO
+    Rating (CustomerId, ProductId, Rate, Description)
+VALUES
+    (1, 1, 5, 'Great tasting orange and very fresh.'),
+    (2, 1, 3, 'Decent product, but a bit pricey.'),
+    (3, 2, 4, 'Excellent TV for the price.'),
+    (1, 3, 4, 'Very durable and convenient bottle.'),
+    (2, 3, 2, 'Good bottle, but could be better insulated.');
 

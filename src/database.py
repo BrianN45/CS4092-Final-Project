@@ -21,7 +21,7 @@ def setup_database():
         connection.rollback()
         print(f"Could not initiate setup: {e}")
         return False
-        
+
     return True
 
 
@@ -124,19 +124,34 @@ def edit_product(staffId, productId, price, quantity, active):
 
 
 def get_products(id=0, active=False):
-    query = "SELECT * FROM Product"
+    query = """
+    SELECT
+        p.Id,
+        p.Name,
+        p.Price,
+        p.Quantity,
+        p.Active,
+        CASE
+            WHEN COUNT(r.ProductId) = 0 THEN 'No Rating'
+            ELSE CAST(ROUND(AVG(r.Rate), 2) AS TEXT)
+        END AS AvgRating
+    FROM Product AS p
+    LEFT JOIN Rating AS r ON p.Id = r.ProductId
+    """
     params = ()
+    conditions = []
 
     if id != 0:
-        query += " WHERE Id = ?"
-        
-        # Show active products only
-        if active:
-            query += " AND Active = 1"
-        params = (id,)
-    elif active:
-        query += " WHERE Active = 1"
-    
+        conditions.append("p.Id = ?")
+        params = (int(id),)
+
+    if active:
+        conditions.append("p.Active = 1")
+
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+
+    query += " GROUP BY p.Id, p.Name, p.Price, p.Quantity, p.Active"
 
     try:
         with sqlite3.connect(DATABASE_NAME) as connection:
@@ -150,8 +165,19 @@ def get_products(id=0, active=False):
     return [Product.from_row(row) for row in rows]
 
 
-def add_credit_card(card_number, name, cvc, expiration_date, street_address, city, state, zip_code):
-    credit_card = (card_number, name, cvc, expiration_date, street_address, city, state, zip_code)
+def add_credit_card(
+    card_number, name, cvc, expiration_date, street_address, city, state, zip_code
+):
+    credit_card = (
+        card_number,
+        name,
+        cvc,
+        expiration_date,
+        street_address,
+        city,
+        state,
+        zip_code,
+    )
     query = """
     INSERT INTO
         CreditCard (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
@@ -170,7 +196,7 @@ def add_credit_card(card_number, name, cvc, expiration_date, street_address, cit
     return True
 
 
-def get_credit_cards(card_number = 0):
+def get_credit_cards(card_number=0):
     query = "SELECT * FROM CreditCard"
 
     params = ()
@@ -190,14 +216,15 @@ def get_credit_cards(card_number = 0):
 
     return credit_cards
 
-def get_customers(id = 0):
+
+def get_customers(id=0):
     query = "SELECT * FROM Customer"
     params = ()
-    
+
     if id != 0:
         query += " WHERE Id = ?"
         params = (id,)
-        
+
     try:
         with sqlite3.connect(DATABASE_NAME) as connection:
             cursor = connection.cursor()
@@ -209,14 +236,15 @@ def get_customers(id = 0):
 
     return customers
 
-def get_staff(id = 0):
+
+def get_staff(id=0):
     query = "SELECT * FROM Staff"
     params = ()
-    
+
     if id != 0:
         query += " WHERE Id = ?"
         params = (id,)
-        
+
     try:
         with sqlite3.connect(DATABASE_NAME) as connection:
             cursor = connection.cursor()
@@ -227,7 +255,8 @@ def get_staff(id = 0):
         return []
 
     return staff
-  
+
+
 def edit_credit_card(card_number, field, new_value):
     query = f"UPDATE CreditCard SET {field} = ? WHERE CardNumber = ?"
     params = (new_value, card_number)
@@ -243,3 +272,53 @@ def edit_credit_card(card_number, field, new_value):
 
     return True
 
+
+def rate_product(customerId, productId, rating, description):
+    query = """
+    INSERT INTO
+        Rating (CustomerId, ProductId, Rate, Description)
+    VALUES
+        (?, ?, ?, ?)
+    ON CONFLICT(CustomerId, ProductId) DO UPDATE SET
+        Rate = excluded.Rate,
+        Description = excluded.Description
+    """
+
+    try:
+        with sqlite3.connect(DATABASE_NAME) as connection:
+            cursor = connection.cursor()
+            cursor.execute(
+                query, (int(customerId), int(productId), int(rating), description)
+            )
+    except sqlite3.Error as e:
+        connection.rollback()
+        print(f"Could not add rating into system: {e}")
+        return False
+
+    return True
+
+
+def get_product_ratings(productId):
+    query = """
+    SELECT
+        c.Name AS CustomerName,
+        p.Name AS ProductName,
+        r.Rate,
+        r.Description
+    FROM Rating AS r
+    JOIN Customer AS c ON r.CustomerId = c.Id
+    JOIN Product AS p ON r.ProductId = p.Id
+    WHERE r.ProductId = ?
+    ORDER BY c.Name
+    """
+
+    try:
+        with sqlite3.connect(DATABASE_NAME) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, (int(productId),))
+            rows = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"Could not retrieve product ratings from system: {e}")
+        return []
+
+    return rows

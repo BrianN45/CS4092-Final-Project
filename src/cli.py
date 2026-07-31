@@ -152,17 +152,36 @@ class Interactive(cmd.Cmd):
         Rate a product.
 
         Arguments:
-            <product id>: Id of the product. You can only rate a product once.
+            <product id>: Id of the product.
         """
         if self.isStaff:
             print("You are not a customer.")
             return
-        
+
         if convert(int, arg) and arg != "":
-            successful = cli_helpers.rate_product(int(arg))
-            
+            successful = cli_helpers.rate_product(self.customerId, int(arg))
+
             if not successful:
                 print(f"Failed to rate product with an id of {arg}.")
+            else:
+                print("Successfully rated product!")
+        else:
+            print("Invalid input, only whole numbers are allowed.")
+
+    def do_view_product_rating(self, arg):
+        """
+        Usage: view_product_rating <product id>
+
+        View all ratings for a product.
+
+        Arguments:
+            <product id>: Id of the product.
+        """
+        if convert(int, arg) and arg != "":
+            successful = cli_helpers.view_product_ratings(int(arg))
+
+            if not successful:
+                print(f"Failed to get product ratings for a product id of {arg}.")
         else:
             print("Invalid input, only whole numbers are allowed.")
 
@@ -184,13 +203,15 @@ class Interactive(cmd.Cmd):
             "add_product - Add a new product.\n"
             "edit_product - Edit a product's quantity and price, or delist it from the store.\n"
         )
-        print("\nAvailable commands for Customer:\n")
         print(
-            "\nAvailable commands for either role:\n"
-            "change - Change your role.\n"
+            "\nAvailable commands for Customer:\n"
             "view_cards - View all credit cards or a specific credit card.\n"
             "add_card - Add a new credit card.\n"
             "edit_card - Edit a credit card's details.\n"
-            "remove_card - Remove a credit card from the system.\n"
-            "view_products - View all products or a specific product.\n"
+        )
+        print(
+            "\nAvailable commands for either role:\n"
+            "change - Change your role.\n"
+            "view_products - View all products or a specific produect.\n"
+            "view_product_rating - Shows a product's rating\n"
         )

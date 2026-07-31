@@ -51,15 +51,20 @@ def add_product():
 
 
 def edit_product(staffid, productId):
-    headers = ["Id", "Name", "Price", "Quantity", "Active"]
+    headers = ["Id", "Name", "Price", "Quantity", "Active", "Rating"]
     result = database.get_products(productId)
 
     if len(result) == 0:
         print(f"No product with an id of {productId} was found.")
         return
 
+    display_rows = [
+        [item.id, item.name, item.price, item.quantity, item.active, item.rating]
+        for item in result
+    ]
+
     print("Information about product:")
-    print(tabulate(result, headers=headers, tablefmt="grid"))
+    print(tabulate(display_rows, headers=headers, tablefmt="grid"))
     print("Enter changes, leave empty if no change needed.")
 
     price_input = get_input(
@@ -97,14 +102,19 @@ def edit_product(staffid, productId):
 
 
 def list_products(id, active=False):
-    headers = ["Id", "Name", "Price", "Quantity", "Active"]
+    headers = ["Id", "Name", "Price", "Quantity", "Active", "Rating"]
     data = database.get_products(id, active)
-    
+
     if len(data) == 0:
         print("No products found.")
         return False
-    
-    print(tabulate(data, headers=headers, tablefmt="grid"))
+
+    display_rows = [
+        [item.id, item.name, item.price, item.quantity, item.active, item.rating]
+        for item in data
+    ]
+
+    print(tabulate(display_rows, headers=headers, tablefmt="grid"))
     return True
 
 
@@ -182,6 +192,7 @@ def list_credit_cards(card_number):
 
     print(tabulate(data, headers=headers, tablefmt="grid"))
 
+
 def change_role(cli, role):
     if role == "staff":
         data = database.get_staff()
@@ -243,7 +254,15 @@ def change_role(cli, role):
 
 
 def edit_credit_card(card_number, field):
-    valid_fields = ["Name", "CVC", "ExpirationDate", "StreetAddress", "City", "State", "ZipCode"]
+    valid_fields = [
+        "Name",
+        "CVC",
+        "ExpirationDate",
+        "StreetAddress",
+        "City",
+        "State",
+        "ZipCode",
+    ]
     if field not in valid_fields:
         print(f"Invalid field name. Valid fields are: {', '.join(valid_fields)}")
         return
@@ -260,8 +279,42 @@ def edit_credit_card(card_number, field):
         print(f"Updated {field} for credit card {card_number}.")
     else:
         print(f"Failed to update {field} for credit card {card_number}.")
-        
 
-def rate_product(id):
-    print(f"Listing product with an id of {id}")
-    list_products(id)
+
+def rate_product(customerId, productId):
+    print(f"Listing product with an id of {productId}")
+    products = list_products(productId)
+
+    if not products:
+        return False
+
+    rating = get_input(
+        "How would you rate the product from 0 to 5? ",
+        r"^[0-5]$",
+        "Invalid input, only whole numbers from 0 to 5 are allowed.",
+    )
+
+    description = get_input(
+        "Why do you rate it that way? ",
+        r".+",
+        "",
+    )
+
+    return database.rate_product(customerId, productId, rating, description)
+
+def view_product_ratings(productId):
+    product = database.get_products(productId)
+
+    if len(product) == 0:
+        print(f"No product with an id of {productId} was found.")
+        return False
+
+    ratings = database.get_product_ratings(productId)
+
+    if len(ratings) == 0:
+        print(f"No ratings found for product with an id of {productId}.")
+        return False
+
+    headers = ["Customer Name", "Product Name", "Rate", "Description"]
+    print(tabulate(ratings, headers=headers, tablefmt="grid"))
+    return True
