@@ -163,13 +163,14 @@ def add_credit_card(card_number, name, cvc, expiration_date, street_address, cit
     return True
 
 
-def get_credit_cards(id = 0):
-    query = "SELECT * FROM Credit_Card"
+def get_credit_cards(card_number = 0):
+    query = "SELECT * FROM CreditCard"
+
     params = ()
 
-    if id != 0:
-        query += " WHERE Id = ?"
-        params = (id,)
+    if card_number != 0:
+        query += " WHERE CardNumber = ?"
+        params = (card_number,)
 
     try:
         with sqlite3.connect(DATABASE_NAME) as connection:
@@ -219,3 +220,19 @@ def get_staff(id = 0):
         return []
 
     return staff
+  
+def edit_credit_card(card_number, field, new_value):
+    query = f"UPDATE CreditCard SET {field} = ? WHERE CardNumber = ?"
+    params = (new_value, card_number)
+
+    try:
+        with sqlite3.connect(databaseName) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            connection.commit()
+    except sqlite3.Error as e:
+        print(f"Could not update credit card in system: {e}")
+        return False
+
+    return True
+

@@ -235,3 +235,23 @@ def change_role(cli, role):
         return True
 
     return False
+def edit_credit_card(card_number, field):
+    valid_fields = ["Name", "CVC", "ExpirationDate", "StreetAddress", "City", "State", "ZipCode"]
+    if field not in valid_fields:
+        print(f"Invalid field name. Valid fields are: {', '.join(valid_fields)}")
+        return
+
+    new_value = get_input(
+        f"Enter new value for {field}: ",
+        r"^[a-zA-Z0-9\s]+$",
+        "Invalid input, only alphanumeric characters and spaces are allowed.",
+    )
+
+    successful = database.edit_credit_card(card_number, field, new_value)
+
+    if successful:
+        print(f"Updated {field} for credit card {card_number}.")
+    else:
+        print(f"Failed to update {field} for credit card {card_number}.")
+        
+
