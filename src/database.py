@@ -186,6 +186,12 @@ def checkout_cart(customer_id, card_number):
             print(f"Not enough quantity for product with id {product_id}.")
             return False
 
+    card_check_query = """
+    SELECT 1
+    FROM CreditCardCustomer
+    WHERE CustomerId = ? AND CardNumber = ?
+    """
+
     total_price = 0
     for _, quantity, unit_price in cart_items:
         total_price += quantity * unit_price
@@ -206,6 +212,11 @@ def checkout_cart(customer_id, card_number):
     try:
         with sqlite3.connect(DATABASE_NAME) as connection:
             cursor = connection.cursor()
+            cursor.execute(card_check_query, (int(customer_id), str(card_number)))
+            if cursor.fetchone() is None:
+                print("Credit card is not associated with this customer.")
+                return False
+
             cursor.execute(purchase_query, (int(customer_id), str(card_number), int(total_price), timestamp))
             purchase_id = cursor.lastrowid
 
