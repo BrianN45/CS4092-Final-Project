@@ -177,6 +177,64 @@ def list_credit_cards(card_number):
 
     print(tabulate(data, headers=headers, tablefmt="grid"))
 
+def change_role(cli, role):
+    if role == "staff":
+        data = database.get_staff()
+
+        headers = ["Id", "Name"]
+        print("Table of available staff members:")
+        print(tabulate(data, headers=headers, tablefmt="grid"))
+
+        id = get_input(
+            "Id of staff: ",
+            r"^[0-9]+$",
+            "Invalid input, only whole numbers are allowed.",
+        )
+
+        staff = database.get_staff(id)
+
+        if len(staff) == 0:
+            print(f"Staff member with an id of {id} was not found.")
+            return False
+
+        headers = ["Id", "Name"]
+        print("Changing to the staff member below...")
+        print(tabulate(staff, headers=headers, tablefmt="grid"))
+
+        cli.isStaff = True
+        cli.staffId = int(staff[0][0])
+
+        return True
+
+    if role == "customer":
+        data = database.get_customers()
+
+        headers = ["Id", "Name"]
+        print("Table of available customers:")
+        print(tabulate(data, headers=headers, tablefmt="grid"))
+
+        id = get_input(
+            "Id of customer: ",
+            r"^[0-9]+$",
+            "Invalid input, only whole numbers are allowed.",
+        )
+
+        customer = database.get_customers(id)
+
+        if len(customer) == 0:
+            print(f"Customer with an id of {id} was not found.")
+            return False
+
+        headers = ["Id", "Name"]
+        print("Changing to the customer below...")
+        print(tabulate(customer, headers=headers, tablefmt="grid"))
+
+        cli.isStaff = False
+        cli.customerId = int(customer[0][0])
+
+        return True
+
+    return False
 def edit_credit_card(card_number, field):
     valid_fields = ["Name", "CVC", "ExpirationDate", "StreetAddress", "City", "State", "ZipCode"]
     if field not in valid_fields:

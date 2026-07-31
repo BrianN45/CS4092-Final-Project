@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS Customer;
 
 DROP TABLE IF EXISTS Product;
 
-DROP TABLE IF EXISTS CreditCard;
+DROP TABLE IF EXISTS Credit_Card;
 
 DROP TABLE IF EXISTS CreditCardCustomer;
 
