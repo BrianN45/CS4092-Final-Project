@@ -4,13 +4,27 @@ DROP TABLE IF EXISTS Inventory_Updates;
 
 DROP TABLE IF EXISTS Staff;
 
+DROP TABLE IF EXISTS Customer;
+
 DROP TABLE IF EXISTS Product;
 
 DROP TABLE IF EXISTS CreditCard;
 
+DROP TABLE IF EXISTS CreditCardCustomer;
+
 CREATE TABLE IF NOT EXISTS Staff (
     Id INTEGER PRIMARY KEY NOT NULL,
     Name NVARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Customer (
+    Id INTEGER PRIMARY KEY NOT NULL,
+    Name NVARCHAR(50) NOT NULL,
+    DoB DATE NOT NULL,
+    StreetAddress NVARCHAR(100) NOT NULL,
+    City NVARCHAR(50) NOT NULL,
+    State NVARCHAR(2) NOT NULL,
+    ZipCode NVARCHAR(10) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Product (
@@ -46,6 +60,14 @@ CREATE TABLE IF NOT EXISTS Credit_Card (
     State NVARCHAR(2) NOT NULL,
     ZipCode NVARCHAR(10) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS CreditCardCustomer (
+    CustomerId INTEGER NOT NULL,
+    CardNumber NVARCHAR(16) NOT NULL,
+    PRIMARY KEY (CustomerId, CardNumber),
+    FOREIGN KEY (CustomerId) REFERENCES Customer(Id),
+    FOREIGN KEY (CardNumber) REFERENCES Credit_Card(CardNumber)
+);
 -- Seeding database
 INSERT INTO
     Staff (Name)
@@ -64,3 +86,11 @@ INSERT INTO
     Credit_Card (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
 VALUES
     ("1234567890123456", "John Doe", "123", "12/25", "123 Main St", "Anytown", "ST", "12345");
+
+INSERT INTO
+    Customer (Name, DoB, StreetAddress, City, State, ZipCode)
+VALUES
+    ("Zach Brown", "1990-01-01", "549 Banana Rd", "Cincinnati", "OH", "45220");    
+    ("Joe Burrow", "1998-02-19", "930 Bengal St", "Cincinnati", "OH", "45247"); 
+    ("Nancy Drew", "2000-10-27", "394 Icecream Dr", "Cincinnati", "OH", "45248"); 
+
