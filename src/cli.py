@@ -63,13 +63,13 @@ class Interactive(cmd.Cmd):
             <product id> - The id of the product. If no id is provided, all products will be displayed.
         """
         if convert(int, arg) and arg != "":
-            cli_helpers.list_products(int(arg))
+            cli_helpers.list_products(int(arg), not self.isStaff)
         else:
             if arg != "":
                 print(
                     "Invalid input, only whole numbers are allowed. Displaying all products instead."
                 )
-            cli_helpers.list_products(0)
+            cli_helpers.list_products(0, not self.isStaff)
 
     def do_add_product(self, arg):
         """
@@ -144,6 +144,27 @@ class Interactive(cmd.Cmd):
         else:
             print("Credit card not found. Displaying all credit cards instead.")
             cli_helpers.list_credit_cards(0)
+
+    def do_rate_product(self, arg):
+        """
+        Usage: rate_product <product id>
+
+        Rate a product.
+
+        Arguments:
+            <product id>: Id of the product. You can only rate a product once.
+        """
+        if self.isStaff:
+            print("You are not a customer.")
+            return
+        
+        if convert(int, arg) and arg != "":
+            successful = cli_helpers.rate_product(int(arg))
+            
+            if not successful:
+                print(f"Failed to rate product with an id of {arg}.")
+        else:
+            print("Invalid input, only whole numbers are allowed.")
 
     def do_exit(self, arg):
         """Exits the application."""

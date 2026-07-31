@@ -1,6 +1,6 @@
 -- When declaring a primary key it has to be INTEGER and not INT to auto-increment
 
-DROP TABLE IF EXISTS Inventory_Updates;
+DROP TABLE IF EXISTS InventoryUpdates;
 
 DROP TABLE IF EXISTS Staff;
 
@@ -8,9 +8,11 @@ DROP TABLE IF EXISTS Customer;
 
 DROP TABLE IF EXISTS Product;
 
-DROP TABLE IF EXISTS Credit_Card;
+DROP TABLE IF EXISTS CreditCard;
 
 DROP TABLE IF EXISTS CreditCardCustomer;
+
+DROP TABLE IF EXISTS Rating;
 
 CREATE TABLE IF NOT EXISTS Staff (
     Id INTEGER PRIMARY KEY NOT NULL,
@@ -36,7 +38,7 @@ CREATE TABLE IF NOT EXISTS Product (
     Active BOOLEAN NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Inventory_Updates (
+CREATE TABLE IF NOT EXISTS InventoryUpdates (
     Staff_Id INT NOT NULL,
     Product_Id INT NOT NULL,
     Date_Updated DATE NOT NULL DEFAULT CURRENT_DATE,
@@ -68,6 +70,17 @@ CREATE TABLE IF NOT EXISTS CreditCardCustomer (
     FOREIGN KEY (CustomerId) REFERENCES Customer(Id),
     FOREIGN KEY (CardNumber) REFERENCES CreditCard(CardNumber)
 );
+
+CREATE TABLE IF NOT EXISTS Rating (
+    CustomerId INT NOT NULL,
+    ProductId INT NOT NULL,
+    Rate DECIMAL NOT NULL,
+    Description TEXT NOT NULL,
+    PRIMARY KEY (CustomerId, ProductId),
+    FOREIGN KEY (CustomerId) REFERENCES Customer(Id),
+    FOREIGN KEY (ProductId) REFERENCES Product(Id)
+);
+
 -- Seeding database
 INSERT INTO
     Staff (Name)

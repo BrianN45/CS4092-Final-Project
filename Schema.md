@@ -7,7 +7,7 @@
 - State
 - Zip Code
 
-# Credit_Card
+# CreditCard
 - Credit_Card_Number (Primary Key)
 - Name
 - CVC
@@ -17,7 +17,7 @@
 - State
 - Zip Code
 
-# Credit_Card_Customer
+# CreditCardCustomer
 - (Credit_Card_Number, Customer_Id) (Primary key)
 - Credit_Card_Number (References Credit_Card_Number in Credit_Card)
 - Customer_Id (References Id in Customer)
@@ -33,7 +33,7 @@
 - Id (Primary key)
 - Name
 
-# Inventory_Updates
+# InventoryUpdates
 - (Staff_Id, Product_Id, Date_Updated) (Primary key)
 - Date_Updated
 - Staff_Id (References Id in Staff)
@@ -44,11 +44,11 @@
 - New_Quantity
 - Active
 
-# Rate
+# Rating
 - (Customer_Id, Product_Id) (Primary key)
 - Customer_Id (References Id in Customer)
 - Product_Id (References Id in Product)
-- Rating
+- Rate
 - Description
 
 # Purchase
@@ -58,7 +58,7 @@
 - Total Price
 - Purchase_Date
 
-# Purchased_Items
+# PurchasedItems
 - (Purchase_Id, Product_Id) (Primary key)
 - Purchase_Id (References Id in Purchase)
 - Product_Id (References Id in Product)

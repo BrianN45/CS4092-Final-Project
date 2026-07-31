@@ -26,7 +26,7 @@ def setup_database():
 
 
 def add_product(name, price, quantity, active):
-    product = Product(name=name, price=price, quantity=quantity, active=bool(active))
+    product = (name, price, quantity, active)
     query = """
     INSERT INTO
         Product (Name, Price, Quantity, Active)
@@ -37,7 +37,7 @@ def add_product(name, price, quantity, active):
     try:
         with sqlite3.connect(DATABASE_NAME) as connection:
             cursor = connection.cursor()
-            cursor.execute(query, product.to_db_tuple())
+            cursor.execute(query, product)
     except sqlite3.Error as e:
         connection.rollback()
         print(f"Could not add product into system: {e}")
@@ -88,7 +88,7 @@ def edit_product(staffId, productId, price, quantity, active):
 
     timestamp = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S.%f")
     logQuery = """
-    INSERT INTO Inventory_Updates (
+    INSERT INTO InventoryUpdates (
         Staff_Id,
         Product_Id,
         Date_Updated,
@@ -123,13 +123,20 @@ def edit_product(staffId, productId, price, quantity, active):
     return True
 
 
-def get_products(id=0):
+def get_products(id=0, active=False):
     query = "SELECT * FROM Product"
     params = ()
 
     if id != 0:
         query += " WHERE Id = ?"
+        
+        # Show active products only
+        if active:
+            query += " AND Active = 1"
         params = (id,)
+    elif active:
+        query += " WHERE Active = 1"
+    
 
     try:
         with sqlite3.connect(DATABASE_NAME) as connection:

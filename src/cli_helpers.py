@@ -96,11 +96,16 @@ def edit_product(staffid, productId):
         print("Product was not updated.")
 
 
-def list_products(id):
+def list_products(id, active=False):
     headers = ["Id", "Name", "Price", "Quantity", "Active"]
-    data = database.get_products(id)
-
+    data = database.get_products(id, active)
+    
+    if len(data) == 0:
+        print("No products found.")
+        return False
+    
     print(tabulate(data, headers=headers, tablefmt="grid"))
+    return True
 
 
 def add_credit_card():
@@ -235,6 +240,8 @@ def change_role(cli, role):
         return True
 
     return False
+
+
 def edit_credit_card(card_number, field):
     valid_fields = ["Name", "CVC", "ExpirationDate", "StreetAddress", "City", "State", "ZipCode"]
     if field not in valid_fields:
@@ -255,3 +262,6 @@ def edit_credit_card(card_number, field):
         print(f"Failed to update {field} for credit card {card_number}.")
         
 
+def rate_product(id):
+    print(f"Listing product with an id of {id}")
+    list_products(id)
