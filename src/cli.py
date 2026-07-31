@@ -111,13 +111,21 @@ class Interactive(cmd.Cmd):
             <credit card number> - The number of the credit card. If no number is provided, all credit cards will be displayed.
         """
         if convert(int, arg) and arg != "":
-            cli_helpers.list_credit_cards(int(arg))
+            cli_helpers.list_credit_cards(
+                int(arg),
+                self.customerId if not self.isStaff else None,
+                self.isStaff,
+            )
         else:
             if arg != "":
                 print(
                     "Invalid input, only whole numbers are allowed. Displaying all credit cards instead."
                 )
-            cli_helpers.list_products(0)
+            cli_helpers.list_credit_cards(
+                0,
+                self.customerId if not self.isStaff else None,
+                self.isStaff,
+            )
 
     def do_add_card(self, arg):
         """
@@ -125,7 +133,10 @@ class Interactive(cmd.Cmd):
 
         Add a credit card into the system.
         """
-        cli_helpers.add_credit_card()
+        cli_helpers.add_credit_card(
+            self.customerId if not self.isStaff else None,
+            self.isStaff,
+        )
 
     def do_edit_card(self, arg):
         """
@@ -137,13 +148,26 @@ class Interactive(cmd.Cmd):
             <card number> - The number of the credit card. You can get the list of credit cards using "insert command here"
         """
         if convert(int, arg) and arg != "":
-            cli_helpers.list_credit_cards(int(arg))
+            cli_helpers.list_credit_cards(
+                int(arg),
+                self.customerId if not self.isStaff else None,
+                self.isStaff,
+            )
             print("which field would you like to edit?")
             field = input("Enter the field name: ")
-            cli_helpers.edit_credit_card(int(arg), field)
+            cli_helpers.edit_credit_card(
+                self.customerId if not self.isStaff else None,
+                int(arg),
+                field,
+                self.isStaff,
+            )
         else:
             print("Credit card not found. Displaying all credit cards instead.")
-            cli_helpers.list_credit_cards(0)
+            cli_helpers.list_credit_cards(
+                0,
+                self.customerId if not self.isStaff else None,
+                self.isStaff,
+            )
 
     def do_exit(self, arg):
         """Exits the application."""

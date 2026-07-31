@@ -143,7 +143,7 @@ def get_products(id=0):
     return [Product.from_row(row) for row in rows]
 
 
-def add_credit_card(card_number, name, cvc, expiration_date, street_address, city, state, zip_code):
+def add_credit_card(customer_id, card_number, name, cvc, expiration_date, street_address, city, state, zip_code):
     credit_card = (card_number, name, cvc, expiration_date, street_address, city, state, zip_code)
     query = """
     INSERT INTO
@@ -151,11 +151,19 @@ def add_credit_card(card_number, name, cvc, expiration_date, street_address, cit
     VALUES
         (?, ?, ?, ?, ?, ?, ?, ?)
     """
+    customerIDquery = """
+    INSERT INTO
+        CreditCardCustomer (CustomerId, CardNumber)
+    VALUES
+        (?, ?)
+    """
 
     try:
         with sqlite3.connect(DATABASE_NAME) as connection:
             cursor = connection.cursor()
             cursor.execute(query, credit_card)
+            if customer_id is not None:
+                cursor.execute(customerIDquery, (int(customer_id), card_number))
     except sqlite3.Error as e:
         print(f"Could not add credit card into system: {e}")
         return False
@@ -163,14 +171,27 @@ def add_credit_card(card_number, name, cvc, expiration_date, street_address, cit
     return True
 
 
-def get_credit_cards(card_number = 0):
-    query = "SELECT * FROM CreditCard"
+def get_credit_cards(card_number = 0, customer_id = None):
+    query = """
+    SELECT cc.CardNumber, cc.Name, cc.CVC, cc.ExpirationDate, cc.StreetAddress, cc.City, cc.State, cc.ZipCode
+    FROM CreditCard cc
+    """
+    params = []
 
-    params = ()
+    if customer_id is not None:
+        query += """
+        INNER JOIN CreditCardCustomer ccc
+            ON cc.CardNumber = ccc.CardNumber
+        WHERE ccc.CustomerId = ?
+        """
+        params.append(int(customer_id))
 
     if card_number != 0:
-        query += " WHERE CardNumber = ?"
-        params = (card_number,)
+        if customer_id is None:
+            query += " WHERE cc.CardNumber = ?"
+        else:
+            query += " AND cc.CardNumber = ?"
+        params.append(str(card_number))
 
     try:
         with sqlite3.connect(DATABASE_NAME) as connection:
@@ -182,6 +203,10 @@ def get_credit_cards(card_number = 0):
         return []
 
     return credit_cards
+
+
+def get_customer_credit_cards(customer_id, card_number = 0):
+    return get_credit_cards(card_number=card_number, customer_id=customer_id)
 
 def get_customers(id = 0):
     query = "SELECT * FROM Customer"
@@ -221,9 +246,10 @@ def get_staff(id = 0):
 
     return staff
   
-def edit_credit_card(card_number, field, new_value):
+def edit_credit_card(customer_id, card_number, field, new_value, is_staff = False):
+
     query = f"UPDATE CreditCard SET {field} = ? WHERE CardNumber = ?"
-    params = (new_value, card_number)
+    params = (new_value, str(card_number))
 
     try:
         with sqlite3.connect(DATABASE_NAME) as connection:

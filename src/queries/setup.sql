@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS Customer;
 
 DROP TABLE IF EXISTS Product;
 
-DROP TABLE IF EXISTS Credit_Card;
+DROP TABLE IF EXISTS CreditCard;
 
 DROP TABLE IF EXISTS CreditCardCustomer;
 
@@ -86,7 +86,10 @@ INSERT INTO
     CreditCard (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
 VALUES
     ("1234567890123456", "John Doe", "123", "12/25", "123 Main St", "Anytown", "ST", "12345");
-
+INSERT INTO
+    CreditCardCustomer (CustomerId, CardNumber)
+VALUES
+    (1, "1234567890123456");
 INSERT INTO
     Customer (Name, DoB, StreetAddress, City, State, ZipCode)
 VALUES

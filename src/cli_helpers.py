@@ -103,7 +103,11 @@ def list_products(id):
     print(tabulate(data, headers=headers, tablefmt="grid"))
 
 
-def add_credit_card():
+def add_credit_card(customer_id = None, is_staff = False):
+    if customer_id is None and not is_staff:
+        print("You must be logged in as a customer to add a credit card.")
+        return False
+
     card_number = get_input(
         "Credit card number: ",
         r"^\d{16}$",
@@ -153,7 +157,15 @@ def add_credit_card():
     )
 
     successful = database.add_credit_card(
-        card_number, name, cvc, expiry, street_address, city, state, zip_code
+        customer_id,
+        card_number,
+        name,
+        cvc,
+        expiry,
+        street_address,
+        city,
+        state,
+        zip_code,
     )
 
     if successful:
@@ -161,8 +173,10 @@ def add_credit_card():
     else:
         print(f"{name}'s credit card was not added to the system.")
 
+    return successful
 
-def list_credit_cards(card_number):
+
+def list_credit_cards(card_number, customer_id = None, is_staff = False):
     headers = [
         "Card Number",
         "Name",
@@ -173,7 +187,11 @@ def list_credit_cards(card_number):
         "State",
         "ZIP Code",
     ]
-    data = database.get_credit_cards(card_number)
+    data = database.get_credit_cards(card_number=card_number, customer_id=customer_id if not is_staff else None)
+
+    if not data:
+        print("No credit cards found.")
+        return
 
     print(tabulate(data, headers=headers, tablefmt="grid"))
 
@@ -235,7 +253,7 @@ def change_role(cli, role):
         return True
 
     return False
-def edit_credit_card(card_number, field):
+def edit_credit_card(customer_id, card_number, field, is_staff = False):
     valid_fields = ["Name", "CVC", "ExpirationDate", "StreetAddress", "City", "State", "ZipCode"]
     if field not in valid_fields:
         print(f"Invalid field name. Valid fields are: {', '.join(valid_fields)}")
@@ -247,11 +265,13 @@ def edit_credit_card(card_number, field):
         "Invalid input, only alphanumeric characters and spaces are allowed.",
     )
 
-    successful = database.edit_credit_card(card_number, field, new_value)
+    successful = database.edit_credit_card(customer_id, card_number, field, new_value, is_staff)
 
     if successful:
         print(f"Updated {field} for credit card {card_number}.")
     else:
         print(f"Failed to update {field} for credit card {card_number}.")
+
+    return successful
         
 
