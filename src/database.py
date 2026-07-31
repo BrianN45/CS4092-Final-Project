@@ -183,6 +183,44 @@ def get_credit_cards(card_number = 0):
 
     return credit_cards
 
+def get_customers(id = 0):
+    query = "SELECT * FROM Customer"
+    params = ()
+    
+    if id != 0:
+        query += " WHERE Id = ?"
+        params = (id,)
+        
+    try:
+        with sqlite3.connect(DATABASE_NAME) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            customers = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"Could not retrieve customers from system: {e}")
+        return []
+
+    return customers
+
+def get_staff(id = 0):
+    query = "SELECT * FROM Staff"
+    params = ()
+    
+    if id != 0:
+        query += " WHERE Id = ?"
+        params = (id,)
+        
+    try:
+        with sqlite3.connect(DATABASE_NAME) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            staff = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"Could not retrieve staff from system: {e}")
+        return []
+
+    return staff
+  
 def edit_credit_card(card_number, field, new_value):
     query = f"UPDATE CreditCard SET {field} = ? WHERE CardNumber = ?"
     params = (new_value, card_number)

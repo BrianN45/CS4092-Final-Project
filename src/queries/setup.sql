@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS Staff;
 
 DROP TABLE IF EXISTS Product;
 
-DROP TABLE IF EXISTS CreditCard;
+DROP TABLE IF EXISTS Credit_Card;
 
 CREATE TABLE IF NOT EXISTS Staff (
     Id INTEGER PRIMARY KEY NOT NULL,
@@ -63,4 +63,4 @@ VALUES
 INSERT INTO
     Credit_Card (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
 VALUES
-    ("1234567890123456", "John Doe", "123", "12/25", "123 Main St", "Anytown", "ST", "12345");
+    ("123456789012345", "John Doe", "123", "12/25", "123 Main St", "Anytown", "ST", "12345");
