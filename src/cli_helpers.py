@@ -89,7 +89,7 @@ def edit_product(staffid, productId):
         print("No changes made.")
         return
 
-    price = price_input * 100 if price_input else None
+    price = int(price_input) * 100 if price_input else None
     quantity = int(quantity_input) if quantity_input else None
     active = 1 if active_input == "Y" else 0 if active_input == "N" else None
 

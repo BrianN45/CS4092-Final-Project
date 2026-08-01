@@ -103,7 +103,7 @@ def edit_product(staffId, productId, price, quantity, active):
         int(staffId),
         int(productId),
         timestamp,
-        product.price,
+        product.price * 100,
         new_price,
         new_quantity,
         new_quantity,
