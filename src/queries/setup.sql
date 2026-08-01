@@ -1,16 +1,32 @@
 -- When declaring a primary key it has to be INTEGER and not INT to auto-increment
 
-DROP TABLE IF EXISTS Inventory_Updates;
+DROP TABLE IF EXISTS InventoryUpdates;
 
 DROP TABLE IF EXISTS Staff;
 
+DROP TABLE IF EXISTS Customer;
+
 DROP TABLE IF EXISTS Product;
 
-DROP TABLE IF EXISTS Credit_Card;
+DROP TABLE IF EXISTS CreditCard;
+
+DROP TABLE IF EXISTS CreditCardCustomer;
+
+DROP TABLE IF EXISTS Rating;
 
 CREATE TABLE IF NOT EXISTS Staff (
     Id INTEGER PRIMARY KEY NOT NULL,
     Name NVARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Customer (
+    Id INTEGER PRIMARY KEY NOT NULL,
+    Name NVARCHAR(50) NOT NULL,
+    DoB DATE NOT NULL,
+    StreetAddress NVARCHAR(100) NOT NULL,
+    City NVARCHAR(50) NOT NULL,
+    State NVARCHAR(2) NOT NULL,
+    ZipCode NVARCHAR(10) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Product (
@@ -22,7 +38,7 @@ CREATE TABLE IF NOT EXISTS Product (
     Active BOOLEAN NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Inventory_Updates (
+CREATE TABLE IF NOT EXISTS InventoryUpdates (
     Staff_Id INT NOT NULL,
     Product_Id INT NOT NULL,
     Date_Updated DATE NOT NULL DEFAULT CURRENT_DATE,
@@ -36,7 +52,7 @@ CREATE TABLE IF NOT EXISTS Inventory_Updates (
     FOREIGN KEY (Product_Id) REFERENCES Product(Id)
 );
 
-CREATE TABLE IF NOT EXISTS Credit_Card (
+CREATE TABLE IF NOT EXISTS CreditCard (
     CardNumber NVARCHAR(16) PRIMARY KEY NOT NULL UNIQUE,
     Name NVARCHAR(50) NOT NULL,
     CVC NVARCHAR(3) NOT NULL,
@@ -46,6 +62,25 @@ CREATE TABLE IF NOT EXISTS Credit_Card (
     State NVARCHAR(2) NOT NULL,
     ZipCode NVARCHAR(10) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS CreditCardCustomer (
+    CustomerId INTEGER NOT NULL,
+    CardNumber NVARCHAR(16) NOT NULL,
+    PRIMARY KEY (CustomerId, CardNumber),
+    FOREIGN KEY (CustomerId) REFERENCES Customer(Id),
+    FOREIGN KEY (CardNumber) REFERENCES CreditCard(CardNumber)
+);
+
+CREATE TABLE IF NOT EXISTS Rating (
+    CustomerId INT NOT NULL,
+    ProductId INT NOT NULL,
+    Rate INT NOT NULL,
+    Description TEXT NOT NULL,
+    PRIMARY KEY (CustomerId, ProductId),
+    FOREIGN KEY (CustomerId) REFERENCES Customer(Id),
+    FOREIGN KEY (ProductId) REFERENCES Product(Id)
+);
+
 -- Seeding database
 INSERT INTO
     Staff (Name)
@@ -61,6 +96,23 @@ VALUES
     ("Owala Bottle", 3000, 57, 1);
 
 INSERT INTO
-    Credit_Card (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
+    CreditCard (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
 VALUES
-    ("123456789012345", "John Doe", "123", "12/25", "123 Main St", "Anytown", "ST", "12345");
+    ("1234567890123456", "John Doe", "123", "12/25", "123 Main St", "Anytown", "ST", "12345");
+
+INSERT INTO
+    Customer (Name, DoB, StreetAddress, City, State, ZipCode)
+VALUES
+    ("Zach Brown", "1990-01-01", "549 Banana Rd", "Cincinnati", "OH", "45220"),
+    ("Joe Burrow", "1998-02-19", "930 Bengal St", "Cincinnati", "OH", "45247"),
+    ("Nancy Drew", "2000-10-27", "394 Icecream Dr", "Cincinnati", "OH", "45248");
+
+INSERT INTO
+    Rating (CustomerId, ProductId, Rate, Description)
+VALUES
+    (1, 1, 5, 'Great tasting orange and very fresh.'),
+    (2, 1, 3, 'Decent product, but a bit pricey.'),
+    (3, 2, 4, 'Excellent TV for the price.'),
+    (1, 3, 4, 'Very durable and convenient bottle.'),
+    (2, 3, 2, 'Good bottle, but could be better insulated.');
+
