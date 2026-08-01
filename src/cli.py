@@ -7,13 +7,19 @@ DEFAULT_CUSTOMER_ID = 1
 commands = [
     "add_product",
     "edit_product",
-    "remove_product",
+    "buy_product",
+    "view_cart",
+    "view_purchases",
+    "checkout",
     "change",
     "view_products",
     "view_cards",
     "add_card",
     "edit_card",
-    "remove_card",
+    "rate_product",
+    "view_product_rating",
+    "exit",
+    "view_product_history"
 ]
 
 
@@ -26,7 +32,7 @@ def convert(type, value):
 
 
 class Interactive(cmd.Cmd):
-    intro = "Welcome to the Super Awesome Store! You are currently logged in as Brian as a Customer.\nType help to see the list of commands.\n"
+    intro = "Welcome to the Super Awesome Store! You are currently logged in as Zach as a Customer.\nType help to see the list of commands.\n"
     prompt = "\nEnter a command: "
     isStaff = False
     staffId = DEFAULT_STAFF_ID
@@ -271,6 +277,24 @@ class Interactive(cmd.Cmd):
         else:
             print("Invalid input, only whole numbers are allowed.")
 
+    def do_view_product_history(self, arg):
+        """
+        Usage: view_product_history <product id>
+
+        View inventory updates for a product.
+
+        Arguments:
+            <product id>: Id of the product.
+        """
+        if not self.isStaff:
+            print("You are not a staff member.")
+            return
+
+        if convert(int, arg) and arg != "":
+            cli_helpers.view_product_history(int(arg))
+        else:
+            print("Invalid input, only product ids are allowed.")
+
     def do_exit(self, arg):
         """Exits the application."""
         print("Exiting application.")
@@ -283,12 +307,14 @@ class Interactive(cmd.Cmd):
                 return
             else:
                 print(f"Command for {arg} not found. Listing all commands.")
-
+                
+        print("\nType help [command] for specific help (e.g., arguments for a command).\n")
 
         print(
             "\nAvailable commands for Staff:\n"
             "add_product - Add a new product.\n"
             "edit_product - Edit a product's quantity and price, or delist it from the store.\n"
+            "view_product_history - Shows inventory updates for a product.\n"
           
             "\nAvailable commands for Customer:\n"
             "view_cards - View all credit cards or a specific credit card.\n"
@@ -297,10 +323,10 @@ class Interactive(cmd.Cmd):
             "buy_product [product_id] [quantity] - Add a product to your cart.\n"
             "view_cart - View the products currently in your cart.\n"
             "view_purchases - View your purchase history.\n"
-            "checkout [card_number] - Checkout the current cart and create a purchase.\n"
+            "checkout - Checkout the current cart and create a purchase.\n"
           
             "\nAvailable commands for either role:\n"
             "change - Change your role.\n"
             "view_products - View all products or a specific product.\n"
-            "view_product_rating - Shows a product's rating\n"
+            "view_product_rating - Shows a product's rating.\n"
         )

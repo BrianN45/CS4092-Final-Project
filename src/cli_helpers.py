@@ -27,7 +27,7 @@ def add_product():
         r"^\d{1,3}(?:,\d{3})*(?:\.\d{2})?|\d+(?:\.\d{2})?$",
         "Invalid input, examples of valid inputs are 50, 12.99, and 1,032.",
     )
-    price = float(price.replace(",", ""))
+    price = price * 100
 
     quantity = get_input(
         "Quantity of the product: ",
@@ -89,7 +89,7 @@ def edit_product(staffid, productId):
         print("No changes made.")
         return
 
-    price = float(price_input.replace(",", "")) * 100 if price_input else None
+    price = price_input * 100 if price_input else None
     quantity = int(quantity_input) if quantity_input else None
     active = 1 if active_input == "Y" else 0 if active_input == "N" else None
 
@@ -99,6 +99,7 @@ def edit_product(staffid, productId):
         print("Product updated successfully.")
     else:
         print("Product was not updated.")
+
 
 def buy_product(customer_id, product_id, quantity):
     successful = database.add_to_cart(customer_id, product_id, quantity)
@@ -117,7 +118,11 @@ def view_cart(customer_id):
         return
 
     headers = ["Product ID", "Quantity", "Unit Price"]
-    print(tabulate(data, headers=headers, tablefmt="grid"))
+    display_rows = [
+        [product_id, quantity, unit_price/100]
+        for product_id, quantity, unit_price in data
+    ]
+    print(tabulate(display_rows, headers=headers, tablefmt="grid"))
 
 
 def view_purchases(customer_id=None, is_staff=False):
@@ -127,8 +132,31 @@ def view_purchases(customer_id=None, is_staff=False):
         print("No purchases found.")
         return
 
-    headers = ["Purchase ID", "Customer ID", "Card Number", "Total Price", "Purchase Date", "Product", "Quantity", "Unit Price"]
-    print(tabulate(data, headers=headers, tablefmt="grid"))
+    headers = [
+        "Purchase ID",
+        "Customer ID",
+        "Card Number",
+        "Total Price",
+        "Purchase Date",
+        "Product",
+        "Quantity",
+        "Unit Price",
+    ]
+    display_rows = [
+        [
+            purchase_id,
+            customer_id,
+            card_number,
+            total_price/100,
+            purchase_date,
+            product_name,
+            quantity,
+            unit_price/100,
+        ]
+        for purchase_id, customer_id, card_number, total_price, purchase_date, product_name, quantity, unit_price in data
+    ]
+
+    print(tabulate(display_rows, headers=headers, tablefmt="grid"))
 
 
 def checkout(customer_id, card_number):
@@ -139,7 +167,8 @@ def checkout(customer_id, card_number):
     else:
         print("Checkout failed.")
 
-def list_purchases(customer_id = None, is_staff = False):
+
+def list_purchases(customer_id=None, is_staff=False):
     headers = ["Purchase ID", "Customer ID", "Purchase Date"]
     data = database.get_purchases(customer_id=customer_id if not is_staff else None)
 
@@ -148,6 +177,7 @@ def list_purchases(customer_id = None, is_staff = False):
         return
 
     print(tabulate(data, headers=headers, tablefmt="grid"))
+
 
 def list_products(id, active=False):
     headers = ["Id", "Name", "Price", "Quantity", "Active", "Rating"]
@@ -166,7 +196,7 @@ def list_products(id, active=False):
     return True
 
 
-def add_credit_card(customer_id = None, is_staff = False):
+def add_credit_card(customer_id=None, is_staff=False):
     if customer_id is None and not is_staff:
         print("You must be logged in as a customer to add a credit card.")
         return False
@@ -239,7 +269,7 @@ def add_credit_card(customer_id = None, is_staff = False):
     return successful
 
 
-def list_credit_cards(card_number, customer_id = None, is_staff = False):
+def list_credit_cards(card_number, customer_id=None, is_staff=False):
     headers = [
         "Card Number",
         "Name",
@@ -250,7 +280,9 @@ def list_credit_cards(card_number, customer_id = None, is_staff = False):
         "State",
         "ZIP Code",
     ]
-    data = database.get_credit_cards(card_number=card_number, customer_id=customer_id if not is_staff else None)
+    data = database.get_credit_cards(
+        card_number=card_number, customer_id=customer_id if not is_staff else None
+    )
 
     if not data:
         print("No credit cards found.")
@@ -291,7 +323,7 @@ def change_role(cli, role):
     if role == "customer":
         data = database.get_customers()
 
-        headers = ["Id", "Name"]
+        headers = ["Id", "Name", "DoB", "StreetAddress", "City", "State", "ZipCode"]
         print("Table of available customers:")
         print(tabulate(data, headers=headers, tablefmt="grid"))
 
@@ -317,8 +349,18 @@ def change_role(cli, role):
         return True
 
     return False
-def edit_credit_card(customer_id, card_number, field, is_staff = False):
-    valid_fields = ["Name", "CVC", "ExpirationDate", "StreetAddress", "City", "State", "ZipCode"]
+
+
+def edit_credit_card(customer_id, card_number, field, is_staff=False):
+    valid_fields = [
+        "Name",
+        "CVC",
+        "ExpirationDate",
+        "StreetAddress",
+        "City",
+        "State",
+        "ZipCode",
+    ]
     if field not in valid_fields:
         print(f"Invalid field name. Valid fields are: {', '.join(valid_fields)}")
         return
@@ -329,7 +371,9 @@ def edit_credit_card(customer_id, card_number, field, is_staff = False):
         "Invalid input, only alphanumeric characters and spaces are allowed.",
     )
 
-    successful = database.edit_credit_card(customer_id, card_number, field, new_value, is_staff)
+    successful = database.edit_credit_card(
+        customer_id, card_number, field, new_value, is_staff
+    )
 
     if successful:
         print(f"Updated {field} for credit card {card_number}.")
@@ -337,7 +381,6 @@ def edit_credit_card(customer_id, card_number, field, is_staff = False):
         print(f"Failed to update {field} for credit card {card_number}.")
 
     return successful
-        
 
 
 def rate_product(customerId, productId):
@@ -361,6 +404,7 @@ def rate_product(customerId, productId):
 
     return database.rate_product(customerId, productId, rating, description)
 
+
 def view_product_ratings(productId):
     product = database.get_products(productId)
 
@@ -376,4 +420,44 @@ def view_product_ratings(productId):
 
     headers = ["Customer Name", "Product Name", "Rate", "Description"]
     print(tabulate(ratings, headers=headers, tablefmt="grid"))
+    return True
+
+def view_product_history(product_id):
+    product = database.get_products(product_id)
+
+    if len(product) == 0:
+        print(f"No product with an id of {product_id} was found.")
+        return False
+
+    data = database.get_inventory_updates(product_id)
+
+    if len(data) == 0:
+        print(f"No inventory history found for product with an id of {product_id}.")
+        return False
+
+    headers = [
+        "Staff ID",
+        "Product ID",
+        "Date Updated",
+        "Old Price",
+        "New Price",
+        "Quantity Change",
+        "New Quantity",
+        "Active",
+    ]
+    display_rows = [
+        [
+            staff_id,
+            product_id,
+            date_updated,
+            old_price/100,
+            new_price/100,
+            quantity_change,
+            new_quantity,
+            "Yes" if active else "No",
+        ]
+        for staff_id, product_id, date_updated, old_price, new_price, quantity_change, new_quantity, active in data
+    ]
+
+    print(tabulate(display_rows, headers=headers, tablefmt="grid"))
     return True

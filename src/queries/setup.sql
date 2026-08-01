@@ -10,9 +10,9 @@ DROP TABLE IF EXISTS Product;
 
 DROP TABLE IF EXISTS CreditCard;
 
-DROP TABLE IF EXISTS Purchases;
+DROP TABLE IF EXISTS Purchase;
 
-DROP TABLE IF EXISTS PurchaseItems;
+DROP TABLE IF EXISTS PurchasedItem;
 
 DROP TABLE IF EXISTS Cart;
 
@@ -100,7 +100,10 @@ CREATE TABLE IF NOT EXISTS PurchasedItem (
 CREATE TABLE IF NOT EXISTS Cart (
     CustomerId INTEGER NOT NULL,
     ProductId INTEGER NOT NULL,
-    Quantity INT NOT NULL
+    Quantity INT NOT NULL,
+    PRIMARY KEY (CustomerId, ProductId),
+    FOREIGN KEY (CustomerId) REFERENCES Customer(Id),
+    FOREIGN KEY (ProductId) REFERENCES Product(Id)
  );
  
 CREATE TABLE IF NOT EXISTS Rating (
@@ -131,10 +134,12 @@ INSERT INTO
     CreditCard (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
 VALUES
     ("1234567890123456", "John Doe", "123", "12/25", "123 Main St", "Anytown", "ST", "12345");
+
 INSERT INTO
     CreditCardCustomer (CustomerId, CardNumber)
 VALUES
     (1, "1234567890123456");
+
 INSERT INTO
     Customer (Name, DoB, StreetAddress, City, State, ZipCode)
 VALUES

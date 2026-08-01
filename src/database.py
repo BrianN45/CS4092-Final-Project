@@ -55,14 +55,14 @@ def edit_product(staffId, productId, price, quantity, active):
 
     product = result[0]
 
-    # Check if quantity is below 0
-    if product.quantity + quantity < 0:
-        print("New quantity is below 0.")
-        return False
-
     new_price = product.price if price is None else price
     new_quantity = product.quantity if quantity is None else product.quantity + quantity
     new_active = product.active if active is None else bool(active)
+    
+    # Check if quantity is below 0
+    if quantity and product.quantity + quantity < 0:
+        print("New quantity is below 0.")
+        return False
 
     updates = []
     updateParams = []
@@ -103,9 +103,9 @@ def edit_product(staffId, productId, price, quantity, active):
         int(staffId),
         int(productId),
         timestamp,
-        product.price * 100,
+        product.price,
         new_price,
-        quantity,
+        new_quantity,
         new_quantity,
         int(new_active),
     )
@@ -473,6 +473,34 @@ def get_product_ratings(productId):
             rows = cursor.fetchall()
     except sqlite3.Error as e:
         print(f"Could not retrieve product ratings from system: {e}")
+        return []
+
+    return rows
+
+
+def get_inventory_updates(product_id):
+    query = """
+    SELECT
+        Staff_Id,
+        Product_Id,
+        Date_Updated,
+        Old_Price,
+        New_Price,
+        Quantity_Change,
+        New_Quantity,
+        Active
+    FROM InventoryUpdates
+    WHERE Product_Id = ?
+    ORDER BY Date_Updated
+    """
+
+    try:
+        with sqlite3.connect(DATABASE_NAME) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, (int(product_id),))
+            rows = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"Could not retrieve inventory updates from system: {e}")
         return []
 
     return rows
