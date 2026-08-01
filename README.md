@@ -46,6 +46,3 @@ Then use the available commands to browse products, add items to the cart, check
 
 ## ER Diagram
 ![ER Diagram](ERDiagram.png)
-
-## Demo Video
-![Demo Video](putVideoHere.mp4)
