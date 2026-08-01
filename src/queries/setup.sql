@@ -10,6 +10,12 @@ DROP TABLE IF EXISTS Product;
 
 DROP TABLE IF EXISTS CreditCard;
 
+DROP TABLE IF EXISTS Purchase;
+
+DROP TABLE IF EXISTS PurchasedItem;
+
+DROP TABLE IF EXISTS Cart;
+
 DROP TABLE IF EXISTS CreditCardCustomer;
 
 DROP TABLE IF EXISTS Rating;
@@ -71,6 +77,35 @@ CREATE TABLE IF NOT EXISTS CreditCardCustomer (
     FOREIGN KEY (CardNumber) REFERENCES CreditCard(CardNumber)
 );
 
+CREATE TABLE IF NOT EXISTS Purchase (
+    Id INTEGER PRIMARY KEY NOT NULL,
+    CustomerId INTEGER NOT NULL,
+    CardNumber NVARCHAR(16) NOT NULL,
+    TotalPrice INT NOT NULL,
+    PurchaseDate DATE NOT NULL DEFAULT CURRENT_DATE,
+    FOREIGN KEY (CustomerId) REFERENCES Customer(Id),
+    FOREIGN KEY (CardNumber) REFERENCES CreditCard(CardNumber)
+);
+
+CREATE TABLE IF NOT EXISTS PurchasedItem (
+    PurchaseId INTEGER NOT NULL,
+    ProductId INTEGER NOT NULL,
+    UnitPrice INT NOT NULL,
+    Quantity INT NOT NULL,
+    PRIMARY KEY (PurchaseId, ProductId),
+    FOREIGN KEY (PurchaseId) REFERENCES Purchase(Id),
+    FOREIGN KEY (ProductId) REFERENCES Product(Id)
+);
+
+CREATE TABLE IF NOT EXISTS Cart (
+    CustomerId INTEGER NOT NULL,
+    ProductId INTEGER NOT NULL,
+    Quantity INT NOT NULL,
+    PRIMARY KEY (CustomerId, ProductId),
+    FOREIGN KEY (CustomerId) REFERENCES Customer(Id),
+    FOREIGN KEY (ProductId) REFERENCES Product(Id)
+ );
+ 
 CREATE TABLE IF NOT EXISTS Rating (
     CustomerId INT NOT NULL,
     ProductId INT NOT NULL,
@@ -80,7 +115,7 @@ CREATE TABLE IF NOT EXISTS Rating (
     FOREIGN KEY (CustomerId) REFERENCES Customer(Id),
     FOREIGN KEY (ProductId) REFERENCES Product(Id)
 );
-
+  
 -- Seeding database
 INSERT INTO
     Staff (Name)
@@ -99,6 +134,11 @@ INSERT INTO
     CreditCard (CardNumber, Name, CVC, ExpirationDate, StreetAddress, City, State, ZipCode)
 VALUES
     ("1234567890123456", "John Doe", "123", "12/25", "123 Main St", "Anytown", "ST", "12345");
+
+INSERT INTO
+    CreditCardCustomer (CustomerId, CardNumber)
+VALUES
+    (1, "1234567890123456");
 
 INSERT INTO
     Customer (Name, DoB, StreetAddress, City, State, ZipCode)

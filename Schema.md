@@ -2,32 +2,32 @@
 - Id (Primary key)
 - Name
 - DoB
-- Street_Address
+- StreetAddress
 - City
 - State
-- Zip Code
+- ZipCode
 
 # CreditCard
-- Credit_Card_Number (Primary Key)
+- CardNumber (Primary Key)
 - Name
 - CVC
-- Expiry_Date
-- Street_Address
+- ExpirationDate
+- StreetAddress
 - City
 - State
-- Zip Code
+- ZipCode
 
 # CreditCardCustomer
-- (Credit_Card_Number, Customer_Id) (Primary key)
-- Credit_Card_Number (References Credit_Card_Number in Credit_Card)
-- Customer_Id (References Id in Customer)
+- (CustomerId, CardNumber) (Primary key)
+- CustomerId (References Id in Customer)
+- CardNumber (References CardNumber in CreditCard)
 
 # Product
 - Id (Primary key)
+- Name
+- Price
 - Quantity
 - Active
-- Price
-- Name
 
 # Staff
 - Id (Primary key)
@@ -51,16 +51,22 @@
 - Rate
 - Description
 
+# Cart
+- (CustomerId, ProductId) (Primary key)
+- CustomerId (References Id in Customer)
+- ProductId (References Id in Product)
+- Quantity
+
 # Purchase
 - Id (Primary key)
-- Customer_Id (References Id in Customer)
-- Card_Number (References Credit_Card_Number in Credit_Card)
-- Total Price
-- Purchase_Date
+- CustomerId (References Id in Customer)
+- CardNumber (References CardNumber in CreditCard)
+- TotalPrice
+- PurchaseDate
 
-# PurchasedItems
-- (Purchase_Id, Product_Id) (Primary key)
-- Purchase_Id (References Id in Purchase)
-- Product_Id (References Id in Product)
-- Unit_Price
+# PurchasedItem
+- (PurchaseId, ProductId) (Primary key)
+- PurchaseId (References Id in Purchase)
+- ProductId (References Id in Product)
+- UnitPrice
 - Quantity
