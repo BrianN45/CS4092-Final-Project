@@ -1,6 +1,6 @@
 -- When declaring a primary key it has to be INTEGER and not INT to auto-increment
 
-DROP TABLE IF EXISTS Inventory_Updates;
+DROP TABLE IF EXISTS InventoryUpdates;
 
 DROP TABLE IF EXISTS Staff;
 
@@ -17,6 +17,8 @@ DROP TABLE IF EXISTS PurchaseItems;
 DROP TABLE IF EXISTS Cart;
 
 DROP TABLE IF EXISTS CreditCardCustomer;
+
+DROP TABLE IF EXISTS Rating;
 
 CREATE TABLE IF NOT EXISTS Staff (
     Id INTEGER PRIMARY KEY NOT NULL,
@@ -42,7 +44,7 @@ CREATE TABLE IF NOT EXISTS Product (
     Active BOOLEAN NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Inventory_Updates (
+CREATE TABLE IF NOT EXISTS InventoryUpdates (
     Staff_Id INT NOT NULL,
     Product_Id INT NOT NULL,
     Date_Updated DATE NOT NULL DEFAULT CURRENT_DATE,
@@ -98,11 +100,19 @@ CREATE TABLE IF NOT EXISTS PurchasedItem (
 CREATE TABLE IF NOT EXISTS Cart (
     CustomerId INTEGER NOT NULL,
     ProductId INTEGER NOT NULL,
-    Quantity INT NOT NULL,
+    Quantity INT NOT NULL
+ );
+ 
+CREATE TABLE IF NOT EXISTS Rating (
+    CustomerId INT NOT NULL,
+    ProductId INT NOT NULL,
+    Rate INT NOT NULL,
+    Description TEXT NOT NULL,
     PRIMARY KEY (CustomerId, ProductId),
     FOREIGN KEY (CustomerId) REFERENCES Customer(Id),
     FOREIGN KEY (ProductId) REFERENCES Product(Id)
 );
+  
 -- Seeding database
 INSERT INTO
     Staff (Name)
@@ -131,4 +141,13 @@ VALUES
     ("Zach Brown", "1990-01-01", "549 Banana Rd", "Cincinnati", "OH", "45220"),
     ("Joe Burrow", "1998-02-19", "930 Bengal St", "Cincinnati", "OH", "45247"),
     ("Nancy Drew", "2000-10-27", "394 Icecream Dr", "Cincinnati", "OH", "45248");
+
+INSERT INTO
+    Rating (CustomerId, ProductId, Rate, Description)
+VALUES
+    (1, 1, 5, 'Great tasting orange and very fresh.'),
+    (2, 1, 3, 'Decent product, but a bit pricey.'),
+    (3, 2, 4, 'Excellent TV for the price.'),
+    (1, 3, 4, 'Very durable and convenient bottle.'),
+    (2, 3, 2, 'Good bottle, but could be better insulated.');
 

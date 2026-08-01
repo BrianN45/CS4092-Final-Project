@@ -63,13 +63,13 @@ class Interactive(cmd.Cmd):
             <product id> - The id of the product. If no id is provided, all products will be displayed.
         """
         if convert(int, arg) and arg != "":
-            cli_helpers.list_products(int(arg))
+            cli_helpers.list_products(int(arg), not self.isStaff)
         else:
             if arg != "":
                 print(
                     "Invalid input, only whole numbers are allowed. Displaying all products instead."
                 )
-            cli_helpers.list_products(0)
+            cli_helpers.list_products(0, not self.isStaff)
 
     def do_add_product(self, arg):
         """
@@ -231,6 +231,46 @@ class Interactive(cmd.Cmd):
                 self.isStaff,
             )
 
+    def do_rate_product(self, arg):
+        """
+        Usage: rate_product <product id>
+
+        Rate a product.
+
+        Arguments:
+            <product id>: Id of the product.
+        """
+        if self.isStaff:
+            print("You are not a customer.")
+            return
+
+        if convert(int, arg) and arg != "":
+            successful = cli_helpers.rate_product(self.customerId, int(arg))
+
+            if not successful:
+                print(f"Failed to rate product with an id of {arg}.")
+            else:
+                print("Successfully rated product!")
+        else:
+            print("Invalid input, only whole numbers are allowed.")
+
+    def do_view_product_rating(self, arg):
+        """
+        Usage: view_product_rating <product id>
+
+        View all ratings for a product.
+
+        Arguments:
+            <product id>: Id of the product.
+        """
+        if convert(int, arg) and arg != "":
+            successful = cli_helpers.view_product_ratings(int(arg))
+
+            if not successful:
+                print(f"Failed to get product ratings for a product id of {arg}.")
+        else:
+            print("Invalid input, only whole numbers are allowed.")
+
     def do_exit(self, arg):
         """Exits the application."""
         print("Exiting application.")
@@ -244,21 +284,23 @@ class Interactive(cmd.Cmd):
             else:
                 print(f"Command for {arg} not found. Listing all commands.")
 
+
         print(
             "\nAvailable commands for Staff:\n"
             "add_product - Add a new product.\n"
             "edit_product - Edit a product's quantity and price, or delist it from the store.\n"
-        )
-        print("\nAvailable commands for Customer:\n")
-        print(
-            "\nAvailable commands for either role:\n"
-            "change [customer/staff]- Change your role.\n"
+          
+            "\nAvailable commands for Customer:\n"
             "view_cards - View all credit cards or a specific credit card.\n"
             "add_card - Add a new credit card.\n"
-            "edit_card [card_number] - Edit a credit card's details.\n"
-            "view_products - View all products or a specific product.\n"
+            "edit_card - Edit a credit card's details.\n"
             "buy_product [product_id] [quantity] - Add a product to your cart.\n"
             "view_cart - View the products currently in your cart.\n"
             "view_purchases - View your purchase history.\n"
             "checkout [card_number] - Checkout the current cart and create a purchase.\n"
+          
+            "\nAvailable commands for either role:\n"
+            "change - Change your role.\n"
+            "view_products - View all products or a specific product.\n"
+            "view_product_rating - Shows a product's rating\n"
         )
