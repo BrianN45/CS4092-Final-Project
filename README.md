@@ -33,6 +33,7 @@ Then use the available commands to browse products, add items to the cart, check
 - `change <customer/staff>`: Change the current role between customer and staff.
 - `add_product`: Add a new product (staff only).
 - `edit_product <product id>`: Edit product price, quantity, or active status (staff only).
+- `view_product_history <product id>`: View staff updates for a product (staff only)
 - `view_products [product id]`: List all products or a specific product.
 - `add_card`: Add a new credit card.
 - `edit_card <card number>`: Edit a credit card's details.
@@ -46,3 +47,6 @@ Then use the available commands to browse products, add items to the cart, check
 
 ## ER Diagram
 ![ER Diagram](ERDiagram.png)
+
+## Video Showcase
+![Video Showcase](Showcase.mp4)
